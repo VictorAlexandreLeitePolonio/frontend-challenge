@@ -18,7 +18,7 @@ import { PageBreadcrumbs } from '@/components/cart/PageBreadcrumbs'
 import { useProfile, useWallets } from '@/hooks/useAccount'
 import { useCart } from '@/hooks/useCart'
 import { useCreateQuote, usePlaceOrder } from '@/hooks/useCheckout'
-import { checkoutDraftStore } from '@/lib/storage'
+import { checkoutDraftStore, pendingOrderStore } from '@/lib/storage'
 import { realtimeEvents } from '@/realtime/events'
 import type { User } from '@/schemas/auth'
 import type { Cart } from '@/schemas/cart'
@@ -38,6 +38,14 @@ function Page() {
   const cart = useCart()
   const wallets = useWallets()
   const profile = useProfile()
+  const navigate = useNavigate()
+  const savedOrderId = pendingOrderStore(user.id).get()?.orderId ?? null
+
+  useEffect(() => {
+    if (!savedOrderId) return
+    checkoutDraftStore(user.id).set(null)
+    void navigate({ to: '/orders/$orderId', params: { orderId: savedOrderId } })
+  }, [savedOrderId, user.id, navigate])
 
   if (cart.isPending || wallets.isPending || profile.isPending) {
     return (
@@ -266,9 +274,21 @@ function CheckoutContent({ cart, wallets, profile, user }: CheckoutContentProps)
     setNotice('A cotação mudou e o carrinho precisa de ajustes. Volte ao carrinho para revisar.')
   }
 
+  const resolveBuyerValues = (): CheckoutFormValues => {
+    if (reviewBuyer) return reviewBuyer
+    const draft = draftStore.get()
+    return {
+      displayName: draftText(draft, 'displayName') ?? initialValues.displayName,
+      username: draftText(draft, 'username') ?? initialValues.username,
+      profileName: draftText(draft, 'profileName') ?? initialValues.profileName,
+      email: draftText(draft, 'email') ?? initialValues.email,
+      note: draftText(draft, 'note') ?? initialValues.note,
+    }
+  }
+
   const handleConfirm = () => {
     if (!quote || !selectedWallet || !selectedWallet.connected) return
-    const buyerValues = reviewBuyer ?? initialValues
+    const buyerValues = resolveBuyerValues()
     const buyer = {
       ...buyerValues,
       network: selectedWallet.network,
