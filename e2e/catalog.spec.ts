@@ -25,15 +25,17 @@ test.describe('catálogo', () => {
     await page.getByRole('option', { name: 'Maior preço' }).click()
     await expect(page).toHaveURL(/sort=price-desc/)
 
-    // busca
-    await page.goto('/')
-    await page.locator('#catalog-search-desktop').fill('golden')
+    // busca: a lupa do header abre o campo; buscar fora da home leva ao catálogo filtrado
+    await page.goto('/cart')
+    await page.getByRole('button', { name: 'Buscar', exact: true }).click()
+    await page.getByLabel('Buscar coleções').fill('golden')
+    await expect(page).toHaveURL(/\/\?q=golden/)
     await expect(page).toHaveURL(/q=golden/)
     await expect(grid.getByRole('article').first()).toContainText(/Golden/i)
     for (const name of await grid.getByRole('article').getByRole('heading').allInnerTexts()) expect(name).toMatch(/golden/i)
 
     // histórico: voltar restaura o estado anterior, refresh mantém
-    await page.locator('#catalog-search-desktop').fill('')
+    await page.getByLabel('Buscar coleções').fill('')
     await expect(page).not.toHaveURL(/q=/)
     const sidebar = page.getByRole('complementary', { name: 'Filtros do catálogo' })
     await sidebar.getByRole('button', { name: 'Música' }).click()
