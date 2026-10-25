@@ -5,11 +5,13 @@ import { Input } from '@/components/ui/input'
 import { useCatalogSearch } from './useCatalogSearch'
 
 interface CatalogSearchBarProps {
+  /** ids distintos para as instâncias mobile e desktop */
+  inputId?: string
   activeFilters: number
   onOpenFilters: () => void
 }
 
-export function CatalogSearchBar({ activeFilters, onOpenFilters }: CatalogSearchBarProps) {
+export function CatalogSearchBar({ inputId = 'catalog-search', activeFilters, onOpenFilters }: CatalogSearchBarProps) {
   const { search, update } = useCatalogSearch()
   const [value, setValue] = useState(search.q ?? '')
   const lastUrlValue = useRef(search.q ?? '')
@@ -48,11 +50,11 @@ export function CatalogSearchBar({ activeFilters, onOpenFilters }: CatalogSearch
     >
       <div className="relative flex-1">
         <Search className="pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
-        <label htmlFor="catalog-search" className="sr-only">
+        <label htmlFor={inputId} className="sr-only">
           Explorar coleções
         </label>
         <Input
-          id="catalog-search"
+          id={inputId}
           value={value}
           onChange={(event) => setValue(event.target.value)}
           placeholder="Explorar coleções"
@@ -64,7 +66,7 @@ export function CatalogSearchBar({ activeFilters, onOpenFilters }: CatalogSearch
       <Button
         type="button"
         onClick={onOpenFilters}
-        className="relative size-[45px] shrink-0 rounded-xl p-0"
+        className="relative size-[45px] shrink-0 rounded-xl p-0 md:hidden"
         aria-label={activeFilters > 0 ? `Abrir filtros, ${activeFilters} ativos` : 'Abrir filtros'}
       >
         <SlidersHorizontal className="size-5" aria-hidden="true" />

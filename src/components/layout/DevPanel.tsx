@@ -22,7 +22,7 @@ export function DevPanel() {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="outline" size="icon" className="fixed bottom-28 left-4 z-50 bg-background md:bottom-4" aria-label="Abrir painel de cenários (mocks)">
+        <Button variant="outline" size="icon" className="fixed top-24 left-0 z-50 size-8 rounded-l-none bg-background opacity-70 hover:opacity-100 md:top-auto md:bottom-4 md:left-4 md:size-10 md:rounded-l-sm md:opacity-100" aria-label="Abrir painel de cenários (mocks)">
           <FlaskConical aria-hidden="true" />
         </Button>
       </SheetTrigger>

@@ -9,6 +9,8 @@ export function MobileTabBar() {
   const { pathname } = useLocation()
   const cart = useCart()
   const count = cart.data?.itemCount ?? 0
+  // Detalhe, carrinho e pagamento têm barra de ação própria no rodapé (Figma mobile).
+  if (/^\/(nft\/|cart|checkout)/.test(pathname)) return null
 
   return (
     <nav aria-label="Navegação" className="fixed inset-x-0 bottom-0 z-40 md:hidden">

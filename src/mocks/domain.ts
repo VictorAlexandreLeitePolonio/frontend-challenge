@@ -30,7 +30,9 @@ export class DomainError extends Error {
 export function toNftSummary(nft: DbNft): NftSummary {
   const inStock = nft.editions.filter((edition) => edition.available > 0)
   const priced = inStock.length > 0 ? inStock : nft.editions
-  const price = priced.map((edition) => edition.price).reduce((min, value) => (compareEth(value, min) < 0 ? value : min))
+  // Preço de vitrine = edição 1/50 (padrão do detalhe, como no Figma); senão a menor disponível.
+  const featured = inStock.find((edition) => edition.id === '1/50')
+  const price = featured?.price ?? priced.map((edition) => edition.price).reduce((min, value) => (compareEth(value, min) < 0 ? value : min))
   return {
     id: nft.id,
     name: nft.name,

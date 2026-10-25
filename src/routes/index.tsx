@@ -81,6 +81,9 @@ function Page() {
           </aside>
 
           <div className="min-w-0">
+            <div className="mb-8 hidden md:block">
+              <CatalogSearchBar inputId="catalog-search-desktop" activeFilters={activeFilters} onOpenFilters={() => setFiltersOpen(true)} />
+            </div>
             <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
               <CatalogTabs value={tab} onChange={changeTab} />
               <CatalogSort
