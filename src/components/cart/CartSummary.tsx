@@ -56,15 +56,15 @@ export function CartSummary({ cart }: CartSummaryProps) {
   }
 
   const checkoutButton = blocked ? (
-    <Button disabled aria-describedby={blockedId} className="h-12 w-full rounded-full md:h-10 md:rounded-sm">
+    <Button disabled aria-describedby={blockedId} className="h-[60px] w-full rounded-full text-base md:h-10 md:rounded-sm md:text-sm">
       Conectar e finalizar
     </Button>
   ) : isAuthenticated ? (
-    <Button asChild className="h-12 w-full rounded-full md:h-10 md:rounded-sm">
+    <Button asChild className="h-[60px] w-full rounded-full bg-gradient-to-b from-accent-text to-primary text-base md:h-10 md:rounded-sm md:bg-none md:text-sm">
       <Link to="/checkout">Conectar e finalizar</Link>
     </Button>
   ) : (
-    <Button asChild className="h-12 w-full rounded-full md:h-10 md:rounded-sm">
+    <Button asChild className="h-[60px] w-full rounded-full bg-gradient-to-b from-accent-text to-primary text-base md:h-10 md:rounded-sm md:bg-none md:text-sm">
       <Link to="/login" search={{ redirect: '/checkout' }}>
         Conectar e finalizar
       </Link>
@@ -74,15 +74,18 @@ export function CartSummary({ cart }: CartSummaryProps) {
   return (
     <section
       aria-labelledby="cart-summary-heading"
-      className="rounded-2xl bg-card p-4 md:rounded-none md:bg-transparent md:p-0"
+      className="fixed inset-x-0 bottom-0 z-30 mx-auto flex max-h-[85dvh] w-full max-w-[480px] flex-col overflow-y-auto rounded-t-[32px] bg-card px-6 pt-6 pb-9 md:static md:z-auto md:max-h-none md:w-auto md:max-w-none md:overflow-visible md:rounded-none md:bg-transparent md:p-0"
     >
-      <h2 id="cart-summary-heading" className="border-b border-border pb-3 font-bold">
+      <h2
+        id="cart-summary-heading"
+        className="sr-only text-base leading-4 font-bold md:not-sr-only md:block md:border-b md:border-border md:pb-3"
+      >
         Resumo da carteira
       </h2>
 
-      <div className="mt-4">
+      <div className="md:mt-6">
         {cart.coupon ? (
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-sm border border-border-soft bg-background/40 px-3 py-2">
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-full border border-border-soft bg-background/40 px-4 py-2.5 md:rounded-sm md:py-2">
             <p className="text-sm">
               Cupom <span className="font-bold text-accent-text">{cart.coupon.code}</span> aplicado
               <span className="block text-xs text-muted-foreground">{cart.coupon.percent}% de desconto</span>
@@ -100,26 +103,28 @@ export function CartSummary({ cart }: CartSummaryProps) {
           </div>
         ) : (
           <form noValidate onSubmit={handleApply} className="flex flex-col gap-2">
-            <Label htmlFor="coupon-code">Código promocional</Label>
-            <div className="flex items-stretch gap-2">
+            <Label htmlFor="coupon-code" className="sr-only leading-4 md:not-sr-only md:flex">
+              Código promocional
+            </Label>
+            <div className="flex h-[50px] items-stretch overflow-hidden rounded-full border border-input md:h-10 md:rounded-sm">
               <Input
                 id="coupon-code"
                 placeholder="Digite o código promocional…"
                 autoComplete="off"
                 aria-invalid={Boolean(form.formState.errors.code)}
                 aria-describedby={form.formState.errors.code ? codeErrorId : undefined}
-                className="h-12 rounded-full md:h-10 md:rounded-sm"
+                className="h-full flex-1 rounded-none border-0 bg-transparent px-4 text-sm placeholder:text-subtle focus-visible:border-0 focus-visible:ring-0 md:px-2 md:text-[13px]"
                 {...form.register('code')}
               />
               <Button
                 type="submit"
-                className="h-12 shrink-0 rounded-full px-5 md:h-10 md:rounded-sm"
+                className="h-full w-[97px] shrink-0 rounded-full px-0 text-sm md:w-[102px] md:rounded-none"
                 disabled={applyCoupon.isPending}
               >
                 {applyCoupon.isPending ? (
                   <>
                     <Loader2 className="animate-spin motion-reduce:animate-none" aria-hidden="true" />
-                    Aplicando…
+                    <span className="sr-only">Aplicando…</span>
                   </>
                 ) : (
                   'Aplicar'
@@ -131,18 +136,21 @@ export function CartSummary({ cart }: CartSummaryProps) {
         )}
       </div>
 
-      <div className="mt-6">
+      <div className="mt-3 md:mt-6">
         <SummaryLines summary={cart.summary} />
       </div>
 
-      <div className="mt-6 flex flex-col gap-3">
+      <div className="mt-7 flex flex-col gap-3 md:mt-5">
         {checkoutButton}
         {blocked && (
           <p id={blockedId} role="alert" className="text-xs text-destructive">
             Remova os itens esgotados ou ajuste as quantidades indisponíveis para finalizar a compra.
           </p>
         )}
-        <Link to="/" className="text-center text-sm text-accent-text underline-offset-4 hover:underline">
+        <Link
+          to="/"
+          className="sr-only text-center text-sm text-accent-text underline-offset-4 hover:underline md:not-sr-only md:block"
+        >
           Continuar explorando
         </Link>
       </div>

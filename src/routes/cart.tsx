@@ -19,14 +19,14 @@ function CartPage() {
   const cart = useCart()
 
   return (
-    <PageContainer className="py-8 md:py-10">
+    <PageContainer className="px-7 py-8">
       <div className="hidden md:block">
         <PageBreadcrumbs current="Carrinho" />
       </div>
 
-      <header className="mb-6 flex items-center justify-between gap-3 md:hidden">
+      <header className="mb-3 flex h-11 items-center justify-between gap-3 md:hidden">
         <MobileBackLink to="/" label="Voltar ao início" />
-        <h1 className="flex-1 text-center text-base font-bold">Carrinho de NFTs</h1>
+        <h1 className="flex-1 text-center text-xl font-bold">Carrinho de NFTs</h1>
         <span className="size-9 shrink-0" aria-hidden="true" />
       </header>
       <h1 className="sr-only hidden md:block">Carrinho de NFTs</h1>
@@ -58,19 +58,19 @@ function CartPage() {
         )}
 
         {cart.isSuccess && cart.data.items.length > 0 && (
-          <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_332px] xl:gap-x-[86px]">
+          <div className="grid gap-8 pb-[370px] xl:grid-cols-[minmax(0,1fr)_332px] xl:gap-x-[86px] md:pb-0">
             <section aria-labelledby="cart-items-heading">
               <h2 id="cart-items-heading" className="sr-only">
                 Itens do carrinho
               </h2>
-              <div className="hidden grid-cols-[minmax(0,1fr)_100px_150px_120px_40px] gap-4 border-b border-border pb-3 text-sm text-muted-foreground md:grid">
+              <div className="hidden grid-cols-[minmax(0,1fr)_138px_136px_148px_48px] border-b border-border pb-3 text-sm leading-4 font-bold md:grid">
                 <span>NFTs</span>
                 <span>Preço</span>
                 <span>Edições</span>
                 <span>Total</span>
                 <span className="sr-only">Ações</span>
               </div>
-              <ul className="mt-4 flex flex-col gap-3 md:mt-0 md:gap-0">
+              <ul className="mt-0 flex flex-col gap-5 md:mt-3 md:gap-3">
                 {cart.data.items.map((item) => (
                   <CartLine key={item.id} item={item} />
                 ))}
@@ -82,7 +82,9 @@ function CartPage() {
         )}
       </div>
 
-      <RelatedNfts />
+      <div className="hidden md:block">
+        <RelatedNfts />
+      </div>
     </PageContainer>
   )
 }

@@ -27,17 +27,20 @@ export function QuantityStepper({ value, max, onChange, label, pending = false, 
     if (next !== value) onChange(next)
   }
 
+  const buttonClass =
+    'grid size-6 shrink-0 place-items-center rounded-full border border-border-soft bg-background/40 text-accent-text transition-colors hover:bg-background/70 disabled:cursor-not-allowed disabled:opacity-40 md:size-5 md:border-transparent md:bg-primary md:text-primary-foreground md:hover:bg-primary/80'
+
   return (
-    <div className={cn('flex items-center gap-1', className)}>
+    <div className={cn('flex items-center gap-0', className)}>
       <button
         type="button"
         aria-label={`Diminuir quantidade de ${label}`}
         disabled={disabled || value <= 1}
         onMouseDown={(event) => event.preventDefault()}
         onClick={() => onChange(value - 1)}
-        className="grid size-6 place-items-center rounded-full bg-primary text-primary-foreground transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
+        className={buttonClass}
       >
-        <Minus className="size-3.5" aria-hidden="true" />
+        <Minus className="size-3 md:size-3" aria-hidden="true" />
       </button>
       <label htmlFor={inputId} className="sr-only">
         Quantidade de {label}
@@ -62,7 +65,7 @@ export function QuantityStepper({ value, max, onChange, label, pending = false, 
             event.currentTarget.blur()
           }
         }}
-        className="h-6 w-8 rounded-sm border border-transparent bg-transparent text-center text-sm tabular-nums outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50 disabled:opacity-60"
+        className="h-6 w-[33px] rounded-sm border border-transparent bg-transparent text-center text-base tabular-nums outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50 disabled:opacity-60 md:h-5 md:w-[35px] md:text-sm"
       />
       <button
         type="button"
@@ -70,14 +73,14 @@ export function QuantityStepper({ value, max, onChange, label, pending = false, 
         disabled={disabled || value >= max}
         onMouseDown={(event) => event.preventDefault()}
         onClick={() => onChange(value + 1)}
-        className="grid size-6 place-items-center rounded-full bg-primary text-primary-foreground transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
+        className={buttonClass}
       >
-        <Plus className="size-3.5" aria-hidden="true" />
+        <Plus className="size-3 md:size-3" aria-hidden="true" />
       </button>
       {pending && (
         <span className="ml-1 inline-flex items-center gap-1 text-xs text-muted-foreground">
           <Loader2 className="size-3 animate-spin motion-reduce:animate-none" aria-hidden="true" />
-          Atualizando
+          <span className="sr-only">Atualizando</span>
         </span>
       )}
     </div>

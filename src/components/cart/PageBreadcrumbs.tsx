@@ -6,7 +6,7 @@ interface PageBreadcrumbsProps {
 
 export function PageBreadcrumbs({ current }: PageBreadcrumbsProps) {
   return (
-    <nav aria-label="Trilha de navegação" className="mb-6 text-sm font-bold md:mb-8">
+    <nav aria-label="Trilha de navegação" className="mb-3 text-sm leading-4 font-medium">
       <ol className="flex flex-wrap items-center gap-2">
         <li>
           <Link to="/" className="transition-colors hover:text-accent-text">
@@ -24,9 +24,7 @@ export function PageBreadcrumbs({ current }: PageBreadcrumbsProps) {
         <li aria-hidden="true" className="text-subtle">
           /
         </li>
-        <li aria-current="page" className="text-accent-text">
-          {current}
-        </li>
+        <li aria-current="page">{current}</li>
       </ol>
     </nav>
   )

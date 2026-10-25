@@ -24,6 +24,7 @@ export function CartLine({ item }: CartLineProps) {
   const outOfStock = item.available === 0
   const exceedsStock = item.quantity > item.available && !outOfStock
   const busy = updateItem.isPending || removeItem.isPending
+  const priceChanged = !outOfStock && item.priceChanged && item.previousUnitPrice != null
 
   const handleQuantity = (quantity: number) => {
     updateItem.mutate(
@@ -63,42 +64,14 @@ export function CartLine({ item }: CartLineProps) {
       onClick={handleRemove}
       disabled={removeItem.isPending}
       aria-label={removeItem.isPending ? `Removendo ${item.name} do carrinho` : `Remover ${item.name} do carrinho`}
-      className="grid size-9 place-items-center rounded-sm text-muted-foreground transition-colors hover:bg-background/40 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+      className="grid size-8 place-items-center rounded-sm text-muted-foreground transition-colors hover:bg-background/40 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
     >
       {removeItem.isPending ? (
-        <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden="true" />
+        <Loader2 className="size-5 animate-spin motion-reduce:animate-none" aria-hidden="true" />
       ) : (
-        <Trash2 className="size-4" aria-hidden="true" />
+        <Trash2 className="size-6" aria-hidden="true" />
       )}
     </button>
-  )
-
-  const identity = (
-    <div className="flex min-w-0 items-center gap-3 md:gap-4">
-      <img
-        {...nftImageProps(item.image, '96px')}
-        alt={`Arte do NFT ${item.name}`}
-        loading="lazy"
-        decoding="async"
-        className="size-20 shrink-0 rounded-sm object-cover md:size-[70px]"
-      />
-      <div className="min-w-0">
-        <h3 className="truncate text-sm font-bold md:text-base">
-          <Link to="/nft/$nftId" params={{ nftId: item.nftId }} className="transition-colors hover:text-accent-text">
-            {item.name}
-          </Link>
-        </h3>
-        <p className="text-xs text-subtle">ID do token: {item.tokenId}</p>
-        <p className="text-xs text-muted-foreground">Edição: {EDITION_LABELS[item.editionId]}</p>
-      </div>
-    </div>
-  )
-
-  const price = (
-    <div className="flex items-baseline gap-2">
-      <span className="text-xs text-muted-foreground md:sr-only">Preço unitário:</span>
-      <EthPrice value={item.unitPrice} previous={item.previousUnitPrice} className="text-sm md:text-[15px]" />
-    </div>
   )
 
   const stepper = (
@@ -119,44 +92,76 @@ export function CartLine({ item }: CartLineProps) {
     </div>
   )
 
-  const lineTotal = (
-    <div className="flex items-baseline justify-between gap-2 md:justify-start">
-      <span className="text-xs text-muted-foreground md:sr-only">Subtotal do item:</span>
-      <EthPrice value={item.lineTotal} className="text-sm md:text-base" />
-    </div>
-  )
-
   return (
     <li aria-busy={busy}>
-      <article className="rounded-sm border border-border bg-card p-3 md:border-0 md:bg-transparent md:p-0">
-        <div className="flex flex-col gap-3 md:hidden">
-          <div className="flex items-start justify-between gap-2">
-            {identity}
-            {removeButton}
+      <article>
+        <div className="relative flex h-[100px] overflow-hidden rounded-xl bg-card md:hidden">
+          <img
+            {...nftImageProps(item.image, '100px')}
+            alt={`Arte do NFT ${item.name}`}
+            loading="lazy"
+            decoding="async"
+            className="h-[100px] w-[100px] shrink-0 rounded-l-xl object-cover"
+          />
+          <div className="flex min-w-0 flex-1 items-center gap-2 pr-4 pl-[9px]">
+            <div className="flex h-full min-w-0 flex-1 flex-col pt-[13px] pb-2">
+              <h3 className="truncate text-[15px] leading-4 font-bold">
+                <Link to="/nft/$nftId" params={{ nftId: item.nftId }} className="transition-colors hover:text-accent-text">
+                  {item.name}
+                </Link>
+              </h3>
+              <p className="mt-1.5 text-xs text-subtle">Edição: {EDITION_LABELS[item.editionId]}</p>
+              <div className="mt-auto flex items-baseline">
+                <span className="sr-only">Subtotal do item: </span>
+                <EthPrice value={item.lineTotal} className="text-lg text-accent-text" />
+              </div>
+            </div>
+            <div className="shrink-0">{stepper}</div>
           </div>
-          <div className="flex items-center justify-between gap-3">
-            {price}
-            {stepper}
-          </div>
-          {lineTotal}
+          <div className="absolute top-1 right-1">{removeButton}</div>
         </div>
 
-        <div className="hidden items-center gap-4 border-b border-border py-4 md:grid md:grid-cols-[minmax(0,1fr)_100px_150px_120px_40px]">
-          {identity}
-          {price}
-          {stepper}
-          {lineTotal}
-          {removeButton}
+        <div className="hidden h-[70px] grid-cols-[minmax(0,1fr)_138px_136px_148px_48px] items-center bg-card md:grid">
+          <div className="flex min-w-0 items-center gap-4">
+            <img
+              {...nftImageProps(item.image, '70px')}
+              alt={`Arte do NFT ${item.name}`}
+              loading="lazy"
+              decoding="async"
+              className="h-[70px] w-[70px] shrink-0 rounded object-cover"
+            />
+            <div className="min-w-0">
+              <h3 className="truncate text-sm leading-4 font-bold">
+                <Link to="/nft/$nftId" params={{ nftId: item.nftId }} className="transition-colors hover:text-accent-text">
+                  {item.name}
+                </Link>
+              </h3>
+              <p className="mt-1.5 text-xs leading-4 text-subtle">ID do token: {item.tokenId}</p>
+            </div>
+          </div>
+          <div className="flex items-baseline gap-2 text-sm text-muted-foreground">
+            <span className="sr-only">Preço unitário: </span>
+            <span>{formatEth(item.unitPrice)}</span>
+            {priceChanged && item.previousUnitPrice && (
+              <span className="text-xs text-muted-foreground line-through">{formatEth(item.previousUnitPrice)}</span>
+            )}
+          </div>
+          <div>{stepper}</div>
+          <div className="flex items-baseline">
+            <span className="sr-only">Subtotal do item: </span>
+            <EthPrice value={item.lineTotal} className="text-base text-accent-text" />
+          </div>
+          <div>{removeButton}</div>
         </div>
 
         {outOfStock && (
-          <p role="status" aria-live="polite" className="mt-2 rounded-sm border border-destructive/50 px-3 py-2 text-xs text-destructive md:mb-2">
+          <p role="status" aria-live="polite" className="mt-2 rounded-sm border border-destructive/50 px-3 py-2 text-xs text-destructive">
             Esgotado — remova este item para finalizar a compra.
           </p>
         )}
-        {!outOfStock && item.priceChanged && item.previousUnitPrice != null && (
-          <p role="status" aria-live="polite" className="mt-2 rounded-sm border border-border-soft bg-background/40 px-3 py-2 text-xs text-accent-text md:mb-2">
-            Preço alterado de {formatEth(item.previousUnitPrice)} para {formatEth(item.unitPrice)}.
+        {priceChanged && (
+          <p role="status" aria-live="polite" className="mt-2 rounded-sm border border-border-soft bg-background/40 px-3 py-2 text-xs text-accent-text">
+            Preço alterado de {formatEth(item.previousUnitPrice!)} para {formatEth(item.unitPrice)}.
             <span className="block text-muted-foreground">O total da linha foi atualizado pela loja.</span>
           </p>
         )}

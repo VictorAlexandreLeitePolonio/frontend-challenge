@@ -6,47 +6,46 @@ export function CartSkeleton() {
       <p role="status" className="sr-only">
         Carregando carrinho…
       </p>
-      <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_332px] xl:gap-x-[86px]" aria-hidden="true">
+      <div className="grid gap-8 pb-[370px] md:pb-0 xl:grid-cols-[minmax(0,1fr)_332px] xl:gap-x-[86px]" aria-hidden="true">
         <div>
-          <div className="hidden grid-cols-[minmax(0,1fr)_100px_150px_120px_40px] gap-4 border-b border-border pb-3 md:grid">
+          <div className="hidden grid-cols-[minmax(0,1fr)_138px_136px_148px_48px] border-b border-border pb-3 text-sm leading-4 font-bold md:grid">
             {['NFTs', 'Preço', 'Edições', 'Total'].map((label) => (
-              <span key={label} className="text-sm text-muted-foreground">
+              <span key={label} className="text-sm font-bold">
                 {label}
               </span>
             ))}
             <span />
           </div>
-          <ul className="mt-4 flex flex-col gap-3 md:gap-0">
+          <ul className="mt-0 flex flex-col gap-5 md:mt-3 md:gap-3">
             {Array.from({ length: 3 }, (_, index) => (
-              <li key={index} className="rounded-sm border border-border p-3 md:border-0 md:border-b md:p-0 md:py-4">
-                <div className="flex items-center gap-3 md:grid md:grid-cols-[minmax(0,1fr)_100px_150px_120px_40px] md:gap-4">
-                  <div className="flex min-w-0 flex-1 items-center gap-3">
-                    <Skeleton className="size-20 shrink-0 rounded-sm md:size-[70px]" />
-                    <div className="flex w-full max-w-56 flex-col gap-2">
+              <li key={index} className="h-[100px] overflow-hidden rounded-xl bg-card md:h-[70px] md:rounded-sm">
+                <div className="flex h-full items-center gap-3 md:grid md:grid-cols-[minmax(0,1fr)_138px_136px_148px_48px] md:gap-0">
+                  <div className="flex h-full min-w-0 flex-1 items-center gap-3 md:gap-4">
+                    <Skeleton className="size-[100px] shrink-0 rounded-none md:size-[70px] md:rounded" />
+                    <div className="flex w-full max-w-56 flex-col gap-2 pr-4">
                       <Skeleton className="h-4 w-3/4" />
                       <Skeleton className="h-3 w-1/2" />
-                      <Skeleton className="h-3 w-2/5" />
+                      <Skeleton className="mt-3 h-4 w-1/3 md:hidden" />
                     </div>
                   </div>
                   <Skeleton className="hidden h-4 w-20 md:block" />
-                  <Skeleton className="hidden h-6 w-28 md:block" />
-                  <Skeleton className="hidden h-4 w-20 md:block" />
-                  <Skeleton className="hidden size-8 md:block" />
+                  <Skeleton className="hidden h-5 w-20 md:block" />
+                  <Skeleton className="hidden h-4 w-24 md:block" />
+                  <Skeleton className="hidden size-7 md:block" />
                 </div>
               </li>
             ))}
           </ul>
         </div>
-        <div className="flex flex-col gap-6 rounded-2xl bg-card p-4 md:rounded-none md:bg-transparent md:p-0">
-          <Skeleton className="h-4 w-48" />
-          <Skeleton className="h-10 w-full" />
+        <div className="fixed inset-x-0 bottom-0 z-30 mx-auto flex w-full max-w-[480px] flex-col gap-6 rounded-t-[32px] bg-card px-6 pt-6 pb-9 md:static md:z-auto md:w-auto md:max-w-none md:rounded-none md:bg-transparent md:p-0">
+          <Skeleton className="h-[50px] w-full rounded-full md:h-10 md:rounded-sm" />
           <div className="flex flex-col gap-3">
             <Skeleton className="h-4 w-full" />
             <Skeleton className="h-4 w-5/6" />
             <Skeleton className="h-4 w-4/6" />
-            <Skeleton className="h-6 w-1/2" />
+            <Skeleton className="h-5 w-1/2" />
           </div>
-          <Skeleton className="h-12 w-full rounded-full md:h-10 md:rounded-sm" />
+          <Skeleton className="h-[60px] w-full rounded-full md:h-10 md:rounded-sm" />
         </div>
       </div>
     </div>
