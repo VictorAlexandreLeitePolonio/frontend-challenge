@@ -38,7 +38,7 @@ export function NftEditionSelector({ editions, value, onChange }: NftEditionSele
                 id={itemId}
                 value={edition.id}
                 disabled={soldOut}
-                className="sr-only"
+                className="absolute inset-0 z-10 size-full cursor-pointer opacity-0"
               />
               <Label
                 htmlFor={itemId}

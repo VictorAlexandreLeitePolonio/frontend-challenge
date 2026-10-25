@@ -19,7 +19,8 @@ function stepFromPrice(price: string | undefined, min: string, max: string, fall
   const value = toWei(price)
   if (value <= low) return 0
   if (value >= high) return STEPS
-  return Number(((value - low) * BigInt(STEPS)) / (high - low))
+  const ratio = ((value - low) * BigInt(STEPS)) / (high - low)
+  return Number(ratio)
 }
 
 function priceAtStep(min: string, max: string, step: number) {
@@ -45,7 +46,7 @@ function FilterItem({ label, count, active, onToggle }: FilterItemProps) {
       onClick={onToggle}
       className={cn(
         'flex w-full items-baseline justify-between gap-2 text-left text-sm text-muted-foreground transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40',
-        active && 'font-bold text-accent-text underline decoration-primary underline-offset-4 hover:text-accent-text',
+        active && 'font-bold text-accent-text hover:text-accent-text',
       )}
     >
       <span>{label}</span>
@@ -132,7 +133,7 @@ export function CatalogFilters({ facets, showSort = false }: CatalogFiltersProps
           <CatalogSort
             value={search.sort ?? 'recent'}
             onChange={(sort) => update({ sort: sort === 'recent' ? undefined : sort })}
-            className="justify-between"
+            layout="stacked"
           />
         </section>
       )}

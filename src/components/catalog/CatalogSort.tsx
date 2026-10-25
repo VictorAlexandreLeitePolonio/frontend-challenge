@@ -7,13 +7,15 @@ import { cn } from '@/lib/utils'
 interface CatalogSortProps {
   value: NftSort
   onChange: (sort: NftSort) => void
+  /** Empilhado para o painel de filtros no mobile. */
+  layout?: 'inline' | 'stacked'
   className?: string
 }
 
-export function CatalogSort({ value, onChange, className }: CatalogSortProps) {
+export function CatalogSort({ value, onChange, layout = 'inline', className }: CatalogSortProps) {
   const id = useId()
   return (
-    <div className={cn('flex items-center gap-2', className)}>
+    <div className={cn(layout === 'stacked' ? 'flex w-full flex-col items-start gap-1' : 'flex items-center gap-2', className)}>
       <Label htmlFor={id} className="shrink-0 text-sm font-normal text-foreground">
         Ordenar por:
       </Label>
@@ -26,7 +28,10 @@ export function CatalogSort({ value, onChange, className }: CatalogSortProps) {
       >
         <SelectTrigger
           id={id}
-          className="h-8 w-[210px] rounded-none border-0 bg-transparent px-0 text-sm focus-visible:ring-0"
+          className={cn(
+            'h-8 rounded-none border-0 bg-transparent px-0 text-sm focus-visible:ring-0',
+            layout === 'stacked' ? 'w-full' : 'w-[210px]',
+          )}
         >
           <SelectValue />
         </SelectTrigger>

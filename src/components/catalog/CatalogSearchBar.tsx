@@ -58,6 +58,7 @@ export function CatalogSearchBar({ activeFilters, onOpenFilters }: CatalogSearch
           placeholder="Explorar coleções"
           className="h-11 rounded-full border-0 bg-card pr-4 pl-11 text-sm placeholder:text-subtle"
           autoComplete="off"
+          maxLength={80}
         />
       </div>
       <Button

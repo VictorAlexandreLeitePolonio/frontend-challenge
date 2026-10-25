@@ -46,7 +46,7 @@ function Page() {
   useEffect(() => {
     if (!data || data.totalPages === 0) return
     if (data.page <= data.totalPages) return
-    update({ page: 1 }, { keepPage: true, replace: true })
+    update({ page: undefined }, { keepPage: true, replace: true })
   }, [data, update])
 
   const changeTab = (next: NftTab) => update({ tab: next === 'all' ? undefined : next })
@@ -144,7 +144,7 @@ function Page() {
                 <CatalogPagination
                   page={data.page}
                   totalPages={data.totalPages}
-                  onChange={(page) => update({ page }, { keepPage: true })}
+                  onChange={(page) => update({ page: page === 1 ? undefined : page }, { keepPage: true })}
                 />
               </>
             )}

@@ -23,6 +23,7 @@ import { useFavorites, useToggleFavorite } from '@/hooks/useFavorites'
 import { useNft } from '@/hooks/useNfts'
 import { useSession } from '@/hooks/useSession'
 import { compareEth, formatEth } from '@/lib/eth'
+import { realtimeEvents } from '@/realtime/events'
 import { NETWORK_LABELS } from '@/schemas/common'
 import { editionIdSchema, type EditionId, type Nft } from '@/schemas/nft'
 
@@ -90,14 +91,6 @@ function Breadcrumb() {
   )
 }
 
-function usePrevious<T>(value: T): T | undefined {
-  const ref = useRef<T | undefined>(undefined)
-  useEffect(() => {
-    ref.current = value
-  })
-  return ref.current
-}
-
 function NftDetail({ nft }: { nft: Nft }) {
   const search = Route.useSearch()
   const navigate = Route.useNavigate()
@@ -123,15 +116,34 @@ function NftDetail({ nft }: { nft: Nft }) {
   const maxQuantity = Math.max(1, selectedEdition?.available ?? 0)
   const quantity = Math.min(Math.max(1, rawQuantity), maxQuantity)
   const soldOut = !selectedEdition || selectedEdition.available === 0
+  const [priceChange, setPriceChange] = useState<{ editionId: EditionId; price: string } | null>(null)
+  const lastPriceRef = useRef<{ editionId: EditionId; price: string } | null>(null)
 
-  const previous = usePrevious(selectedEdition ? { id: selectedEdition.id, price: selectedEdition.price } : undefined)
   const previousPrice =
     selectedEdition &&
-    previous &&
-    previous.id === selectedEdition.id &&
-    compareEth(previous.price, selectedEdition.price) !== 0
-      ? previous.price
+    priceChange?.editionId === selectedEdition.id &&
+    compareEth(priceChange.price, selectedEdition.price) !== 0
+      ? priceChange.price
       : null
+
+  useEffect(() => {
+    lastPriceRef.current = selectedEdition
+      ? { editionId: selectedEdition.id, price: selectedEdition.price }
+      : null
+  }, [selectedEdition])
+
+  useEffect(() => {
+    const editionId = selectedEdition?.id
+    if (!editionId) return
+    return realtimeEvents.on('nft.updated', (event) => {
+      if (event.resource.id !== nft.id) return
+      const known = lastPriceRef.current
+      if (!known || known.editionId !== editionId) return
+      const updated = event.data.editions.find((edition) => edition.id === editionId)
+      if (!updated || compareEth(updated.price, known.price) === 0) return
+      setPriceChange({ editionId, price: known.price })
+    })
+  }, [nft.id, selectedEdition?.id])
 
   useEffect(() => {
     if (!selectedEdition || search.edition === selectedEdition.id) return
@@ -143,6 +155,7 @@ function NftDetail({ nft }: { nft: Nft }) {
 
   const selectEdition = (edition: EditionId) => {
     setBuyError(null)
+    setPriceChange(null)
     void navigate({ search: (prev) => ({ ...prev, edition }), replace: true })
   }
 

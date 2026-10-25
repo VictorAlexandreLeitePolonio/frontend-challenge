@@ -26,7 +26,7 @@ export function CatalogTabs({ value, onChange }: CatalogTabsProps) {
             className={cn(
               'relative pb-2 text-sm text-muted-foreground transition-colors hover:text-foreground',
               active &&
-                'font-bold text-accent-text underline decoration-primary decoration-2 underline-offset-[10px]',
+                'font-bold text-accent-text after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-primary',
             )}
           >
             {tab.label}
