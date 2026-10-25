@@ -31,3 +31,9 @@ blob-report
 .lighthouseci
 .env
 .claude/settings.local.json
+
+# docs internos de trabalho (não versionar)
+docs/superpowers/
+docs/agents/
+docs/figma/
+lighthouse-reports/
