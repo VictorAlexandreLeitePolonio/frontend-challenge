@@ -1,13 +1,12 @@
 import { Skeleton } from '@/components/ui/skeleton'
 
-/** Mesmas dimensões da tabela e do resumo para o layout não saltar quando o carrinho chega. */
 export function CartSkeleton() {
   return (
     <div>
       <p role="status" className="sr-only">
         Carregando carrinho…
       </p>
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_332px] lg:gap-x-[86px]" aria-hidden="true">
+      <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_332px] xl:gap-x-[86px]" aria-hidden="true">
         <div>
           <div className="hidden grid-cols-[minmax(0,1fr)_100px_150px_120px_40px] gap-4 border-b border-border pb-3 md:grid">
             {['NFTs', 'Preço', 'Edições', 'Total'].map((label) => (

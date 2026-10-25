@@ -4,7 +4,6 @@ interface PageBreadcrumbsProps {
   current: string
 }
 
-/** Trilha "Início / Mercado / <página>" usada nas telas de carrinho, pagamento e pedido. */
 export function PageBreadcrumbs({ current }: PageBreadcrumbsProps) {
   return (
     <nav aria-label="Trilha de navegação" className="mb-6 text-sm font-bold md:mb-8">

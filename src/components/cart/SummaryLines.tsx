@@ -4,10 +4,10 @@ import type { Summary } from '@/schemas/common'
 
 interface SummaryLinesProps {
   summary: Summary
+  networkFeeHint?: boolean
 }
 
-/** Linhas de valores vindas da API (carrinho, cotação ou recibo) — nunca recalculadas no cliente. */
-export function SummaryLines({ summary }: SummaryLinesProps) {
+export function SummaryLines({ summary, networkFeeHint = true }: SummaryLinesProps) {
   return (
     <dl className="flex flex-col gap-3 text-sm">
       <div className="flex items-baseline justify-between gap-4">
@@ -21,7 +21,7 @@ export function SummaryLines({ summary }: SummaryLinesProps) {
       <div className="flex items-baseline justify-between gap-4">
         <dt className="flex flex-col">
           Taxa de rede
-          <span className="text-[11px] text-accent-text">Taxa estimada</span>
+          {networkFeeHint && <span className="text-[11px] text-accent-text">Taxa estimada</span>}
         </dt>
         <dd className="tabular-nums">{formatEth(summary.networkFee)}</dd>
       </div>

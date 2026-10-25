@@ -3,7 +3,6 @@ import { NftCard } from '@/components/common/NftCard'
 import { NftCardSkeleton } from '@/components/common/NftCardSkeleton'
 import { useNfts } from '@/hooks/useNfts'
 
-/** "Colecionadores também viram" do carrinho: catálogo real, sem dados inventados. */
 export function RelatedNfts() {
   const query = useNfts({ pageSize: 5 })
 

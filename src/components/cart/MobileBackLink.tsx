@@ -8,7 +8,6 @@ interface MobileBackLinkProps {
   className?: string
 }
 
-/** Botão circular de voltar do cabeçalho mobile (o layout raiz não tem header no mobile). */
 export function MobileBackLink({ to, label, className }: MobileBackLinkProps) {
   return (
     <Link

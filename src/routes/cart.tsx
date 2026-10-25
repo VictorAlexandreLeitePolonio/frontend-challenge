@@ -58,7 +58,7 @@ function CartPage() {
         )}
 
         {cart.isSuccess && cart.data.items.length > 0 && (
-          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_332px] lg:gap-x-[86px]">
+          <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_332px] xl:gap-x-[86px]">
             <section aria-labelledby="cart-items-heading">
               <h2 id="cart-items-heading" className="sr-only">
                 Itens do carrinho

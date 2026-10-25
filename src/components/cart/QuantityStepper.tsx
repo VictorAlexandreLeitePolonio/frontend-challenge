@@ -4,7 +4,6 @@ import { cn } from '@/lib/utils'
 
 interface QuantityStepperProps {
   value: number
-  /** Estoque atual da edição. Em 0 o controle fica bloqueado. */
   max: number
   onChange: (quantity: number) => void
   label: string
@@ -13,7 +12,6 @@ interface QuantityStepperProps {
   className?: string
 }
 
-/** Stepper − / campo / + limitado a 1..max. O campo aceita digitação e só envia no blur/Enter. */
 export function QuantityStepper({ value, max, onChange, label, pending = false, describedBy, className }: QuantityStepperProps) {
   const inputId = useId()
   const disabled = pending || max <= 0
@@ -35,6 +33,7 @@ export function QuantityStepper({ value, max, onChange, label, pending = false, 
         type="button"
         aria-label={`Diminuir quantidade de ${label}`}
         disabled={disabled || value <= 1}
+        onMouseDown={(event) => event.preventDefault()}
         onClick={() => onChange(value - 1)}
         className="grid size-6 place-items-center rounded-full bg-primary text-primary-foreground transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
       >
@@ -69,6 +68,7 @@ export function QuantityStepper({ value, max, onChange, label, pending = false, 
         type="button"
         aria-label={`Aumentar quantidade de ${label}`}
         disabled={disabled || value >= max}
+        onMouseDown={(event) => event.preventDefault()}
         onClick={() => onChange(value + 1)}
         className="grid size-6 place-items-center rounded-full bg-primary text-primary-foreground transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
       >
