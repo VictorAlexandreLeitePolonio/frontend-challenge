@@ -43,6 +43,7 @@ function Page() {
   const tab = search.tab ?? 'all'
   const activeFilters =
     (search.collections?.length ?? 0) + (search.networks?.length ?? 0) + (search.minPrice || search.maxPrice ? 1 : 0)
+  const loading = query.isPlaceholderData || (query.isPending && !data)
   const featured = data?.items.find((item) => item.compareAtPrice !== null) ?? data?.items[0]
 
   useEffect(() => {
@@ -89,13 +90,6 @@ function Page() {
           <div className="min-w-0">
             <div className="flex flex-col gap-5 md:flex-row md:flex-wrap md:items-center md:justify-between md:gap-0 xl:flex-nowrap">
               <CatalogTabs value={tab} onChange={changeTab} />
-              <CatalogSearchBar
-                inputId="catalog-search-desktop"
-                activeFilters={activeFilters}
-                onOpenFilters={() => setFiltersOpen(true)}
-                compact
-                className="hidden md:flex md:w-[170px]"
-              />
               <CatalogSort
                 value={search.sort ?? 'recent'}
                 onChange={(sort) => update({ sort: sort === 'recent' ? undefined : sort })}
@@ -103,14 +97,11 @@ function Page() {
               />
             </div>
 
-            <div
-              className="h-0 overflow-hidden text-xs text-muted-foreground md:mt-1 md:h-4"
-              aria-live="polite"
-            >
-              {query.isFetching && !query.isPending ? 'Atualizando resultados…' : ''}
+            <div className="sr-only" aria-live="polite">
+              {loading ? 'Carregando NFTs…' : ''}
             </div>
 
-            {query.isPending && !data && (
+            {loading && (
               isDesktop ? (
                 <div className="grid grid-cols-2 gap-x-4 gap-y-6 md:gap-y-12 lg:grid-cols-3 lg:gap-x-[34px] lg:gap-y-[72px]">
                   {Array.from({ length: 9 }, (_, index) => (
@@ -148,7 +139,7 @@ function Page() {
               </div>
             )}
 
-            {data && data.items.length === 0 && (
+            {!loading && data && data.items.length === 0 && (
               <EmptyState
                 title="Nenhum NFT encontrado"
                 description="Ajuste a busca ou os filtros para descobrir outras obras."
@@ -165,7 +156,7 @@ function Page() {
               />
             )}
 
-            {data && data.items.length > 0 && (
+            {!loading && data && data.items.length > 0 && (
               <>
                 {isDesktop ? (
                   <div className="grid grid-cols-2 gap-x-4 gap-y-6 md:gap-y-12 lg:grid-cols-3 lg:gap-x-[34px] lg:gap-y-[72px]">
