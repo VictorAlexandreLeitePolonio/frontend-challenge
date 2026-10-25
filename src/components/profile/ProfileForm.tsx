@@ -1,29 +1,52 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { AlertTriangle, UserRound } from 'lucide-react'
+import { AlertTriangle, ChevronDown, UserRound } from 'lucide-react'
 import { useRef, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch, type UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
+import { z } from 'zod'
+import { ApiError } from '@/api/client'
+import { applyApiFieldErrors } from '@/components/auth/api-field-errors'
+import { PasswordInput } from '@/components/auth/PasswordInput'
 import { errorMessage } from '@/components/common/ErrorState'
 import { FieldError } from '@/components/common/FieldError'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useUpdateProfile } from '@/hooks/useAccount'
-import { avatarSchema, updateProfileInputSchema, type Profile, type UpdateProfileInput } from '@/schemas/profile'
-import { applyApiFieldErrors } from '@/components/auth/api-field-errors'
+import { useChangePassword, useUpdateProfile } from '@/hooks/useAccount'
+import { avatarSchema, changePasswordInputSchema, updateProfileInputSchema, type Profile } from '@/schemas/profile'
 
 const fieldClass = 'h-12 rounded-xl border-border bg-background/40 md:h-10 md:rounded-sm'
 const AVATAR_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif']
 const AVATAR_MAX_BYTES = 1024 * 1024
-const fieldNames = ['displayName', 'username', 'email', 'ensName', 'walletNickname', 'avatar'] as const
+const PROFILE_FIELDS = ['displayName', 'username', 'email', 'ensName', 'walletNickname'] as const
+const PASSWORD_FIELDS = ['currentPassword', 'newPassword', 'confirmPassword'] as const
+const PROFILE_ERROR_FIELDS = [...PROFILE_FIELDS, 'avatar'] as const
 
-function toFormValues(profile: Profile): UpdateProfileInput {
+// Um único formulário: a senha só é validada (e enviada) quando algum dos três campos está preenchido.
+const profileFormSchema = updateProfileInputSchema
+  .extend({ currentPassword: z.string(), newPassword: z.string(), confirmPassword: z.string() })
+  .superRefine((data, ctx) => {
+    if (!PASSWORD_FIELDS.some((field) => data[field])) return
+    const parsed = changePasswordInputSchema.safeParse({
+      currentPassword: data.currentPassword,
+      newPassword: data.newPassword,
+      confirmPassword: data.confirmPassword,
+    })
+    if (parsed.success) return
+    for (const issue of parsed.error.issues) ctx.addIssue({ code: 'custom', path: issue.path, message: issue.message })
+  })
+type ProfileFormValues = z.infer<typeof profileFormSchema>
+
+function toFormValues(profile: Profile) {
   return {
     displayName: profile.displayName,
     username: profile.username,
     email: profile.email,
     ensName: profile.ensName,
     walletNickname: profile.walletNickname,
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
   }
 }
 
@@ -36,40 +59,89 @@ function readAsDataUrl(file: File): Promise<string> {
   })
 }
 
+interface PasswordFieldProps {
+  form: UseFormReturn<ProfileFormValues>
+  name: (typeof PASSWORD_FIELDS)[number]
+  id: string
+  label: string
+  autoComplete: string
+}
+
+function PasswordField({ form, name, id, label, autoComplete }: PasswordFieldProps) {
+  const error = form.formState.errors[name]?.message
+  return (
+    <div className="flex flex-col gap-3">
+      <Label htmlFor={id} className="font-normal">
+        {label}
+      </Label>
+      <PasswordInput
+        id={id}
+        autoComplete={autoComplete}
+        className={fieldClass}
+        aria-invalid={Boolean(error)}
+        aria-describedby={error ? `${id}-error` : undefined}
+        {...form.register(name)}
+      />
+      <FieldError id={`${id}-error`} message={error} />
+    </div>
+  )
+}
+
 interface ProfileFormProps {
   profile: Profile
 }
 
 export function ProfileForm({ profile }: ProfileFormProps) {
   const updateProfile = useUpdateProfile()
+  const changePassword = useChangePassword()
   const fileInput = useRef<HTMLInputElement>(null)
   const [avatar, setAvatar] = useState<string | null>(profile.avatar)
   const [formError, setFormError] = useState<string | null>(null)
-  const form = useForm<UpdateProfileInput>({
-    resolver: zodResolver(updateProfileInputSchema),
+  const form = useForm<ProfileFormValues>({
+    resolver: zodResolver(profileFormSchema),
     defaultValues: toFormValues(profile),
   })
 
+  const values = useWatch({ control: form.control })
+  const pending = updateProfile.isPending || changePassword.isPending
   const avatarChanged = avatar !== profile.avatar
-  const saveDisabled = updateProfile.isPending || (!form.formState.isDirty && !avatarChanged)
+  const profileChanged = avatarChanged || PROFILE_FIELDS.some((field) => values[field] !== profile[field])
+  const passwordFilled = PASSWORD_FIELDS.some((field) => values[field])
+  const saveDisabled = pending || !(profileChanged || passwordFilled)
 
-  const onSubmit = form.handleSubmit((values) => {
+  const onSubmit = form.handleSubmit(async (formValues) => {
     setFormError(null)
     form.clearErrors('avatar')
-    updateProfile.mutate(
-      { ...values, avatar },
-      {
-        onSuccess: (next) => {
-          form.reset(toFormValues(next))
-          setAvatar(next.avatar)
-          toast.success('Perfil atualizado')
-        },
-        onError: (error) => {
-          const applied = applyApiFieldErrors(error, form.setError, fieldNames)
-          if (!applied) setFormError(errorMessage(error, 'Não foi possível salvar o perfil. Tente novamente.'))
-        },
-      },
-    )
+    const { currentPassword, newPassword, confirmPassword, ...profileValues } = formValues
+    const sendProfile = avatar !== profile.avatar || PROFILE_FIELDS.some((field) => profileValues[field] !== profile[field])
+    const sendPassword = PASSWORD_FIELDS.some((field) => formValues[field])
+
+    const [profileResult, passwordResult] = await Promise.allSettled([
+      sendProfile ? updateProfile.mutateAsync({ ...profileValues, avatar }) : Promise.resolve(undefined),
+      sendPassword ? changePassword.mutateAsync({ currentPassword, newPassword, confirmPassword }) : Promise.resolve(undefined),
+    ])
+
+    const errors: string[] = []
+    if (profileResult.status === 'fulfilled' && profileResult.value) setAvatar(profileResult.value.avatar)
+    if (profileResult.status === 'rejected' && !applyApiFieldErrors(profileResult.reason, form.setError, PROFILE_ERROR_FIELDS)) {
+      errors.push(errorMessage(profileResult.reason, 'Não foi possível salvar o perfil. Tente novamente.'))
+    }
+    if (passwordResult.status === 'rejected') {
+      const error = passwordResult.reason
+      if (error instanceof ApiError && error.code === 'INVALID_CREDENTIALS') {
+        form.setError('currentPassword', { type: 'server', message: 'Senha atual incorreta' })
+      } else if (!applyApiFieldErrors(error, form.setError, PASSWORD_FIELDS)) {
+        errors.push(errorMessage(error, 'Não foi possível alterar a senha. Tente novamente.'))
+      }
+    }
+    if (errors.length > 0) setFormError(errors.join(' '))
+
+    const profileSaved = sendProfile && profileResult.status === 'fulfilled'
+    const passwordSaved = sendPassword && passwordResult.status === 'fulfilled'
+    if (passwordSaved) PASSWORD_FIELDS.forEach((field) => form.resetField(field))
+    if (profileSaved && passwordSaved) toast.success('Perfil atualizado e senha alterada')
+    else if (profileSaved) toast.success('Perfil atualizado')
+    else if (passwordSaved) toast.success('Senha alterada')
   })
 
   async function handleFile(event: React.ChangeEvent<HTMLInputElement>) {
@@ -112,9 +184,9 @@ export function ProfileForm({ profile }: ProfileFormProps) {
         </div>
       )}
 
-      <div className="grid gap-7 md:grid-cols-2">
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="profile-display-name">
+      <div className="grid gap-x-7 gap-y-6 md:grid-cols-2">
+        <div className="flex flex-col gap-2.5">
+          <Label htmlFor="profile-display-name" className="h-[29px] font-normal">
             Nome de exibição <span className="text-primary" aria-hidden="true">*</span>
           </Label>
           <Input
@@ -127,8 +199,8 @@ export function ProfileForm({ profile }: ProfileFormProps) {
           <FieldError id="profile-display-name-error" message={form.formState.errors.displayName?.message} />
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="profile-username">
+        <div className="flex flex-col gap-2.5">
+          <Label htmlFor="profile-username" className="h-[29px] font-normal">
             Nome de usuário <span className="text-primary" aria-hidden="true">*</span>
           </Label>
           <Input
@@ -142,8 +214,8 @@ export function ProfileForm({ profile }: ProfileFormProps) {
           <FieldError id="profile-username-error" message={form.formState.errors.username?.message} />
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="profile-email">
+        <div className="flex flex-col gap-2.5">
+          <Label htmlFor="profile-email" className="h-[29px] font-normal">
             E-mail <span className="text-primary" aria-hidden="true">*</span>
           </Label>
           <Input
@@ -158,27 +230,31 @@ export function ProfileForm({ profile }: ProfileFormProps) {
           <FieldError id="profile-email-error" message={form.formState.errors.email?.message} />
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="profile-ens">
+        <div className="flex flex-col gap-2.5">
+          <Label htmlFor="profile-ens" className="h-[29px] font-normal">
             Nome ENS <span className="text-primary" aria-hidden="true">*</span>
           </Label>
-          <div className="relative">
+          <div className="flex gap-2.5">
+            <span
+              aria-hidden="true"
+              className="flex h-12 w-[78px] shrink-0 items-center justify-between rounded-xl border border-border bg-background/40 px-2.5 text-sm text-muted-foreground md:h-10 md:rounded-sm"
+            >
+              .eth
+              <ChevronDown className="size-5" />
+            </span>
             <Input
               id="profile-ens"
-              className={`${fieldClass} pr-14`}
+              className={`${fieldClass} min-w-0 flex-1`}
               aria-invalid={Boolean(form.formState.errors.ensName)}
               aria-describedby={form.formState.errors.ensName ? 'profile-ens-error' : undefined}
               {...form.register('ensName')}
             />
-            <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground" aria-hidden="true">
-              .eth
-            </span>
           </div>
           <FieldError id="profile-ens-error" message={form.formState.errors.ensName?.message} />
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="profile-wallet-nickname">
+        <div className="flex flex-col gap-2.5">
+          <Label htmlFor="profile-wallet-nickname" className="h-[29px] font-normal">
             Apelido da carteira <span className="text-primary" aria-hidden="true">*</span>
           </Label>
           <Input
@@ -191,8 +267,8 @@ export function ProfileForm({ profile }: ProfileFormProps) {
           <FieldError id="profile-wallet-nickname-error" message={form.formState.errors.walletNickname?.message} />
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <p id="profile-avatar-label" className="text-sm font-medium">
+        <div className="flex flex-col gap-2.5">
+          <p id="profile-avatar-label" className="flex h-[29px] items-center text-sm">
             Avatar
           </p>
           <div role="group" aria-labelledby="profile-avatar-label" className="flex flex-wrap items-center gap-4">
@@ -214,13 +290,13 @@ export function ProfileForm({ profile }: ProfileFormProps) {
             />
             <Button
               type="button"
-              variant="outline"
+              className="w-[98px]"
               onClick={() => fileInput.current?.click()}
               aria-describedby={form.formState.errors.avatar ? 'avatar-help profile-avatar-error' : 'avatar-help'}
             >
               Alterar
             </Button>
-            <Button type="button" variant="ghost" onClick={removeAvatar} disabled={!avatar}>
+            <Button type="button" variant="ghost" onClick={removeAvatar} disabled={!avatar} className="text-foreground">
               Remover
             </Button>
           </div>
@@ -231,8 +307,17 @@ export function ProfileForm({ profile }: ProfileFormProps) {
         </div>
       </div>
 
-      <Button type="submit" disabled={saveDisabled} className="mt-8 h-10 w-fit px-8">
-        {updateProfile.isPending ? 'Salvando…' : 'Salvar'}
+      <section aria-labelledby="profile-password-title" className="mt-8 flex flex-col gap-6 md:max-w-[417px]">
+        <h2 id="profile-password-title" className="text-base font-bold">
+          Alterar senha
+        </h2>
+        <PasswordField form={form} name="currentPassword" id="current-password" label="Senha atual" autoComplete="current-password" />
+        <PasswordField form={form} name="newPassword" id="new-password" label="Nova senha" autoComplete="new-password" />
+        <PasswordField form={form} name="confirmPassword" id="confirm-new-password" label="Confirmar nova senha" autoComplete="new-password" />
+      </section>
+
+      <Button type="submit" disabled={saveDisabled} className="mt-8 h-10 w-fit px-10">
+        {pending ? 'Salvando…' : 'Salvar'}
       </Button>
     </form>
   )

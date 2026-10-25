@@ -2,7 +2,6 @@ import { createFileRoute } from '@tanstack/react-router'
 import { ErrorState } from '@/components/common/ErrorState'
 import { PageContainer } from '@/components/layout/PageContainer'
 import { AccountSidebar } from '@/components/profile/AccountSidebar'
-import { PasswordForm } from '@/components/profile/PasswordForm'
 import { ProfileForm } from '@/components/profile/ProfileForm'
 import { ProfileSkeleton } from '@/components/profile/ProfileSkeleton'
 import { useProfile } from '@/hooks/useAccount'
@@ -32,12 +31,7 @@ function Page() {
                 isRetrying={profile.isFetching}
               />
             )}
-            {profile.data && (
-              <>
-                <ProfileForm profile={profile.data} />
-                <PasswordForm />
-              </>
-            )}
+            {profile.data && <ProfileForm profile={profile.data} />}
           </div>
         </section>
       </div>
