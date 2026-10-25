@@ -178,17 +178,12 @@ Decisões completas (com alternativas e custos) em [docs/DECISIONS.md](docs/DECI
 | Início | Grade de 2 colunas em 768 px (3 a partir de 1024) | Evitar cards comprimidos no tablet |
 | Início | Loading troca os cards por skeletons em toda request nova (filtro, página, busca) | O enunciado pede skeletons nos componentes dependentes de dados; manter os cards antigos com um aviso discreto deixava o carregamento invisível |
 | Início | Preço do card = edição 1/50 | Igual ao detalhe e ao Figma (1.19 ETH); evita card e detalhe com preços diferentes |
-| Detalhe | "Mais desta coleção" com 3 cards (Figma: 5) | Só mostra NFTs da mesma coleção; o mock tem 3 outros por coleção, completar com outras coleções contradiria o título |
-| Detalhe | Ícones de compartilhamento genéricos | `lucide-react` 1.x não tem ícones de marca; compartilhamento está fora do escopo |
 | Detalhe/Carrinho/Pagamento (mobile) | Sem tab bar inferior | Os frames mobile dessas telas têm barra de ação própria |
-| Carrinho | Linha mostra edição e subtotal | Necessário para distinguir edições do mesmo NFT |
 | Pagamento | Fluxo em duas etapas (Revisar → Confirmar) | O enunciado exige revisão antes do envio e revalidação da cotação |
 | Pagamento | Campos de rede, endereço, tipo, ENS e indicação vêm da carteira escolhida | Pertencem à carteira cadastrada; editar soltos no checkout geraria divergência com o servidor |
-| Pagamento (mobile) | Layout derivado do desktop | O frame mobile não pôde ser exportado (limite da API do Figma); segue o padrão do carrinho mobile |
+| Pagamento (mobile) | Antes de "Confirmar compra", o botão passa por "Conectar carteira" e "Revisar pedido" | Layout igual ao frame mobile (carteiras cadastradas + provedor da carteira escolhida). O frame não tem formulário: os dados do comprador vêm do perfil e da carteira, e a conexão e a revisão exigidas pelo enunciado viram estados do mesmo botão |
 | Confirmação | Tela própria com o card de 578 px | Garante acesso direto e refresh ao recibo |
-| Perfil | Igual ao Figma: um único "Salvar" | Envia perfil e/ou senha só se mudaram; cada erro da API volta para o campo da request que falhou, e o toast diz o que foi salvo |
-| Carteiras | Igual ao Figma: formulário direto, já preenchido | Status de conexão discreto ao lado do título; "Igual à carteira principal" pré-preenche a secundária |
-| Login/Cadastro (desktop) | Modal sobre a página atual (`?auth=login\|signup`) | Fechar só remove o parâmetro; em `/login` (guards, sessão expirada) o fundo é herói + catálogo e fechar nunca volta a uma rota protegida |
+| Login/Cadastro | `/login` e `/signup` redirecionam para `?auth=` sobre uma página real | Igual ao Figma (modal sobre a home, sem escurecer). Guards e sessão expirada abrem o diálogo sobre a home; fechar só tira o parâmetro e nunca cai numa rota protegida |
 | Login/Cadastro (mobile) | Botão fechar (X) | A tela é um diálogo em tela cheia com foco contido; precisa de saída |
 | Tablet (768) | Herói e destaques do footer em escala intermediária | O Figma só tem 1440 e 414; as medidas fixas do desktop não cabem em 768 |
 
