@@ -17,9 +17,9 @@ const SOCIAL_NETWORKS: SocialNetwork[] = ['facebook', 'instagram', 'x', 'linkedi
 export function Footer() {
   return (
     <footer className="mx-auto mt-24 hidden w-full max-w-[1200px] px-6 pb-6 md:block xl:px-0">
-      <div className="grid grid-cols-4 gap-0 bg-card px-12 py-8">
+      <div className="grid grid-cols-2 gap-x-6 gap-y-8 bg-card px-8 py-8 lg:grid-cols-4 lg:gap-0 lg:px-12">
         {FEATURES.map((feature) => (
-          <div key={feature.letter} className="flex flex-col gap-3 border-r border-primary pr-6 pl-6 first:pl-0">
+          <div key={feature.letter} className="flex flex-col gap-3 lg:border-r lg:border-primary lg:px-6 lg:first:pl-0">
             <span className="grid size-[74px] place-items-center rounded-full bg-primary text-2xl font-bold text-primary-foreground" aria-hidden="true">
               {feature.letter}
             </span>
@@ -27,7 +27,7 @@ export function Footer() {
             <p className="text-sm leading-[22px] text-accent-text">{feature.text}</p>
           </div>
         ))}
-        <div className="flex flex-col gap-3 pl-6">
+        <div className="flex flex-col gap-3 lg:pl-6">
           <h2 className="text-lg leading-4 font-bold">Antecipe-se ao próximo lançamento</h2>
           <form className="flex" aria-describedby="newsletter-status" onSubmit={(event) => event.preventDefault()}>
             <label htmlFor="newsletter" className="sr-only">

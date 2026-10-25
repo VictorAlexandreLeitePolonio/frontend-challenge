@@ -7,18 +7,18 @@ export function HeroBanner() {
   return (
     <section
       aria-labelledby="hero-title"
-      className="relative overflow-hidden rounded-3xl bg-card md:mt-8 md:h-[450px] md:rounded-[30px] md:bg-transparent"
+      className="relative overflow-hidden rounded-3xl bg-card md:mt-8 md:h-[420px] md:rounded-[30px] lg:h-[450px] md:bg-transparent"
     >
       <div className="pointer-events-none absolute inset-0 bg-primary/5 md:hidden" aria-hidden="true" />
       <div className="pointer-events-none absolute top-[-31px] left-[-80px] size-[248px] rounded-full bg-primary/35 md:hidden" aria-hidden="true" />
       <div className="pointer-events-none absolute top-[-10px] left-[73px] size-[248px] rounded-full bg-primary/15 md:hidden" aria-hidden="true" />
 
-      <div className="relative h-[190px] px-4 pt-1.5 md:h-[450px] md:px-0 md:pt-[43px] md:pl-10">
-        <div className="flex w-[52%] flex-col md:w-[600px]">
+      <div className="relative h-[190px] px-4 pt-1.5 md:h-[420px] lg:h-[450px] md:px-0 md:pt-[43px] md:pl-10">
+        <div className="flex w-[52%] flex-col md:w-[calc(100%-340px)] lg:w-[600px]">
           <p className="text-xs leading-4 md:text-sm md:leading-4">Bem-vindo à Kurio</p>
           <h1
             id="hero-title"
-            className="text-base leading-[29px] font-bold md:mt-2 md:text-[43px] md:leading-[70px]"
+            className="text-base leading-[29px] font-bold md:mt-2 md:text-[30px] md:leading-[48px] lg:text-[43px] lg:leading-[70px]"
           >
             <span className="md:hidden">
               SEJA DONO DA
@@ -74,7 +74,7 @@ export function HeroBanner() {
           {...nftImageProps('emerald-ape', '450px')}
           alt="Emerald Ape #042, destaque da coleção Kurio Apes"
           fetchPriority="high"
-          className="absolute top-0 right-0 hidden h-[450px] w-[450px] rounded-[30px] object-cover md:block"
+          className="absolute top-0 right-0 hidden size-[300px] rounded-[30px] lg:size-[450px] object-cover md:block"
         />
       </div>
 
