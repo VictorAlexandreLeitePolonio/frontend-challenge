@@ -31,7 +31,7 @@ test('carrinho', async ({ page }) => {
 test('pagamento', async ({ page }) => {
   await addToCart(page)
   await login(page, ALICE, '/checkout')
-  await expect(page.getByRole('button', { name: 'Revisar pedido' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Carteira e rede' })).toBeVisible()
   await page.waitForLoadState('networkidle')
   await expect(page).toHaveScreenshot('pagamento.png', { fullPage: true, mask: mask(page) })
 })
