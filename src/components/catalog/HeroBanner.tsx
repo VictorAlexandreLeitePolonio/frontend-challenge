@@ -32,8 +32,11 @@ export function HeroBanner() {
             </span>
           </h1>
           <p className="mt-1.5 text-[11px] leading-[17px] text-muted-foreground min-[414px]:text-xs min-[414px]:leading-[18px] md:mt-1 md:max-w-[557px] md:text-sm md:leading-6">
-            Descubra NFTs selecionados de criadores emergentes e consagrados. Colecione arte digital rara, apoie artistas e tenha uma
-            parte da cultura da internet.
+            <span className="md:hidden">Descubra NFTs selecionados de criadores do mundo todo.</span>
+            <span className="hidden md:inline">
+              Descubra NFTs selecionados de criadores emergentes e consagrados. Colecione arte digital rara, apoie artistas e tenha uma
+              parte da cultura da internet.
+            </span>
           </p>
           <a
             href="#catalogo"

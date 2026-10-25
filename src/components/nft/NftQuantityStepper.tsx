@@ -49,7 +49,7 @@ export function NftQuantityStepper({
             aria-label="Diminuir quantidade"
             disabled={disabled || soldOut || quantity <= 1}
             onClick={() => update(quantity - 1)}
-            className="grid size-5 place-items-center text-primary transition-opacity disabled:cursor-not-allowed disabled:opacity-40"
+            className="grid size-5 place-items-center rounded-full bg-primary text-primary-foreground transition-opacity disabled:cursor-not-allowed disabled:opacity-40"
           >
             <Minus className="size-4" aria-hidden="true" />
           </button>
@@ -73,7 +73,7 @@ export function NftQuantityStepper({
             aria-label="Aumentar quantidade"
             disabled={disabled || soldOut || atLimit}
             onClick={() => update(quantity + 1)}
-            className="grid size-5 place-items-center text-primary transition-opacity disabled:cursor-not-allowed disabled:opacity-40"
+            className="grid size-5 place-items-center rounded-full bg-primary text-primary-foreground transition-opacity disabled:cursor-not-allowed disabled:opacity-40"
           >
             <Plus className="size-4" aria-hidden="true" />
           </button>

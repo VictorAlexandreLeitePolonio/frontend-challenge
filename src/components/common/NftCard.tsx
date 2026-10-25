@@ -57,7 +57,7 @@ export function NftCard({ nft, priority = false, className, actions }: NftCardPr
 
   return (
     <article className={cn('group relative flex flex-col gap-2 md:gap-3', className)}>
-      <div className="relative flex aspect-[7/8] items-center bg-card p-1 md:aspect-[43/50]">
+      <div className="relative flex aspect-[7/8] items-center rounded-2xl bg-card p-1 md:aspect-[43/50] md:rounded-none">
         <div className="relative w-full">
           <img
             {...nftImageProps(nft.image)}
