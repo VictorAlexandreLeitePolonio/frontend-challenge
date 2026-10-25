@@ -4,10 +4,10 @@ Páginas: início (`/`) e detalhe do NFT (`/nft/emerald-ape-042`). Build otimiza
 
 | Página | Perfil | Performance | Accessibility | Best Practices | SEO | LCP | CLS | TBT |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Início | Desktop | 99 | 100 | 100 | 100 | 0,91 s | 0 | 0 ms |
-| Detalhe | Desktop | 99 | 100 | 100 | 100 | 0,95 s | 0 | 0 ms |
-| Início | Mobile | 90 | 100 | 100 | 100 | 3,33 s | 0 | 10 ms |
-| Detalhe | Mobile | 91 | 100 | 100 | 100 | 3,31 s | 0 | 0 ms |
+| Início | Desktop | 100 | 100 | 100 | 100 | 0,81 s | 0 | 0 ms |
+| Detalhe | Desktop | 99 | 100 | 100 | 100 | 0,80 s | 0 | 0 ms |
+| Início | Mobile | 89 | 100 | 100 | 100 | 3,42 s | 0 | 12 ms |
+| Detalhe | Mobile | 91 | 100 | 100 | 100 | 3,26 s | 0 | 14 ms |
 
 Relatórios HTML/JSON de todas as execuções: `lighthouse-reports/desktop` e `lighthouse-reports/mobile`. Configuração versionada: `lighthouserc.desktop.json` e `lighthouserc.mobile.json`.
 
@@ -33,3 +33,12 @@ npm run lighthouse   # build + 3 execuções por página em cada perfil
 - **CLS 0:** skeletons com as mesmas dimensões do conteúdo e `main` com altura mínima de uma tela, para o footer não "pular" quando os dados chegam. Uma primeira medição no detalhe tinha CLS 0,144 por esse motivo.
 - **Acessibilidade 100:** a auditoria apontou contraste baixo nos ícones sociais do footer e alvos de toque de 10 px nos pontos dos carrosséis mobile. Os dois foram corrigidos (alvo de 24 px com o ponto visual mantido).
 - **SEO 100:** `lang="pt-BR"`, título e descrição, e `robots.txt` válido. Antes, a reescrita da SPA devolvia HTML em `/robots.txt`.
+
+## Rodada de fidelidade ao Figma
+
+A auditoria foi refeita depois da rodada de fidelidade. Duas regressões de acessibilidade no mobile apareceram e foram corrigidas antes de registrar as medianas acima:
+
+- **Contraste do link "EXPLORAR" do herói mobile (3,87:1).** Com o texto curto do Figma, o link passou a ficar sobre o círculo decorativo `#674228`. Recebeu um laranja um tom mais claro (`#f3b06f`, 4,71:1).
+- **Alvos de toque de 12 px nos pontos do carrossel do detalhe.** Voltaram a ter 24 × 24 px, com o ponto visual de 7 px dentro.
+
+A variação de 1 ponto na performance mobile da home (90 → 89) está dentro do ruído entre execuções com throttling de 4G lento. O LCP se mantém em ~3,4 s.

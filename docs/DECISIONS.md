@@ -159,7 +159,7 @@ O caminho crítico mobile é bootstrap → MSW → app → `/api/nfts` → image
 
 ## 18. Login como modal sobre a página atual (`?auth=`)
 
-**Decisão.** O botão "Entrar" adiciona `?auth=login` à URL atual e o root renderiza o diálogo por cima da página real, como no Figma. Fechar remove só o parâmetro. As rotas `/login` e `/signup` continuam existindo para os guards, a sessão expirada e o acesso direto, com herói e catálogo atrás.
+**Decisão.** O botão "Entrar" adiciona `?auth=login` à URL atual e o root renderiza o diálogo por cima da página real, como no Figma. Fechar remove só o parâmetro. As rotas `/login` e `/signup` continuam existindo para os guards, a sessão expirada e links diretos, mas só redirecionam: abrem o mesmo diálogo sobre a página de destino (se pública) ou sobre a home. Assim o fundo é sempre uma página real, idêntico ao Figma.
 
 **Por quê.** Antes, o login era uma rota com um fundo fixo, e "Fechar" navegava para o `redirect`. Quando o redirect era uma rota protegida, o guard mandava de volta ao login e o modal parecia não fechar. Com o estado no search param, fechar é sempre seguro, e em `/login` fechar só volta ao `redirect` se ele for público.
 
