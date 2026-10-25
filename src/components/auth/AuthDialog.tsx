@@ -37,6 +37,9 @@ const COPY: Record<AuthMode, { title: string; mobileTitle: string; subtitle: str
   },
 }
 
+/** Altura fixa do modal desktop no Figma (login 600px, cadastro 656px). */
+const DESKTOP_HEIGHT: Record<AuthMode, string> = { login: 'min-h-[600px]', signup: 'min-h-[656px]' }
+
 interface AuthDialogProps {
   mode: AuthMode
   redirect?: string
@@ -67,34 +70,34 @@ export function AuthDialog({ mode, redirect }: AuthDialogProps) {
           className={cn(
             'fixed z-50 flex flex-col overflow-y-auto bg-card text-foreground outline-none',
             isDesktop
-              ? 'top-1/2 left-1/2 max-h-[calc(100dvh-2rem)] w-[500px] max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2'
+              ? cn('top-1/2 left-1/2 max-h-[calc(100dvh-2rem)] w-[500px] max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2', DESKTOP_HEIGHT[mode])
               : 'inset-0 h-dvh bg-background',
           )}
         >
           <DialogPrimitive.Title className="sr-only">{copy.title}</DialogPrimitive.Title>
           <DialogPrimitive.Close asChild>
-            <Button type="button" variant="ghost" size="icon-sm" aria-label="Fechar" className="absolute top-3 right-3 z-10">
-              <X aria-hidden="true" />
+            <Button type="button" variant="ghost" size="icon-sm" aria-label="Fechar" className="absolute top-2 right-2 z-10 text-primary hover:bg-transparent hover:text-primary">
+              <X className="size-[18px]" aria-hidden="true" />
             </Button>
           </DialogPrimitive.Close>
 
           {isDesktop ? (
             <>
-              <div className="px-12 pt-12 pb-8">
+              <div className="flex flex-1 flex-col px-12 pt-12">
                 <AuthTabs mode={mode} />
-                <DialogPrimitive.Description className="mt-6 text-center text-sm leading-5 text-muted-foreground">{copy.subtitle}</DialogPrimitive.Description>
+                <DialogPrimitive.Description className="mt-10 text-center text-[13px] leading-4 text-muted-foreground">{copy.subtitle}</DialogPrimitive.Description>
                 <div className="mt-6">{form}</div>
-                <SocialAuth className="mt-8" />
+                <SocialAuth className="mt-6" />
               </div>
               <div className="h-2.5 w-full bg-primary" aria-hidden="true" />
             </>
           ) : (
-            <div className="mx-auto flex min-h-full w-full max-w-[480px] flex-col px-7 pt-20 pb-10">
-              <p className="text-center text-[40px] leading-[42px] font-bold tracking-[0.08em]">KURIO</p>
-              <h1 className="mt-14 text-center text-base font-bold">{copy.mobileTitle}</h1>
-              <div className="mt-8">{form}</div>
-              <SocialAuth className="mt-10" />
-              <p className="mt-auto pt-10 text-center text-sm">
+            <div className="mx-auto flex min-h-full w-full max-w-[480px] flex-col px-7 pt-[127px] pb-10">
+              <p className="text-center text-[36px] leading-[42px] font-bold">KURIO</p>
+              <h1 className="mt-[87px] text-center text-lg leading-4 font-bold">{copy.mobileTitle}</h1>
+              <div className="mt-10">{form}</div>
+              <SocialAuth className="mt-10 gap-4" />
+              <p className="mt-10 text-center text-[15px]">
                 {mode === 'login' ? (
                   <>
                     Novo na Kurio?{' '}

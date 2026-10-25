@@ -12,7 +12,7 @@ import { registerInputSchema, type RegisterInput } from '@/schemas/auth'
 import { applyApiFieldErrors } from './api-field-errors'
 import { PasswordInput } from './PasswordInput'
 
-const fieldClass = 'h-12 rounded-xl border-border bg-background/40 md:h-10 md:rounded-sm'
+const fieldClass = 'h-[50px] rounded-xl border-border bg-background/40 pl-4 text-[13px] md:h-10 md:rounded-sm md:text-sm'
 const fields = ['username', 'email', 'password', 'confirmPassword'] as const
 
 interface SignupFormProps {
@@ -112,7 +112,7 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
         <FieldError id="signup-confirm-password-error" message={form.formState.errors.confirmPassword?.message} />
       </div>
 
-      <Button type="submit" disabled={registerAccount.isPending} className="mt-3 h-12 w-full text-base md:h-11 md:text-sm">
+      <Button type="submit" disabled={registerAccount.isPending} className="mt-7 h-[60px] w-full rounded-xl text-base md:mt-3 md:h-[45px] md:rounded-sm">
         {registerAccount.isPending ? (
           'Criando…'
         ) : (

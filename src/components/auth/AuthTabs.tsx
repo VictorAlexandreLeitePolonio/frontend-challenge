@@ -7,16 +7,16 @@ interface AuthTabsProps {
   mode: AuthMode
 }
 
-const tab = 'border-b-2 border-transparent pb-1 text-base tracking-wide transition-colors hover:text-accent-text'
-const activeTab = 'border-primary font-bold text-primary'
+const tab = 'text-xl leading-5 transition-colors hover:text-accent-text'
+const activeTab = 'text-primary'
 
 export function AuthTabs({ mode }: AuthTabsProps) {
   return (
-    <nav aria-label="Acesso à conta" className="flex items-center justify-center gap-3">
+    <nav aria-label="Acesso à conta" className="flex items-center justify-center gap-2">
       <AuthModeLink mode="login" current={mode === 'login'} className={cn(tab, mode === 'login' ? activeTab : 'text-foreground')}>
         Entrar
       </AuthModeLink>
-      <span className="h-5 w-px bg-border-soft" aria-hidden="true" />
+      <span className="h-5 w-px bg-primary" aria-hidden="true" />
       <AuthModeLink mode="signup" current={mode === 'signup'} className={cn(tab, mode === 'signup' ? activeTab : 'text-foreground')}>
         Criar conta
       </AuthModeLink>

@@ -13,7 +13,7 @@ import { loginInputSchema, type LoginInput } from '@/schemas/auth'
 import { applyApiFieldErrors } from './api-field-errors'
 import { PasswordInput } from './PasswordInput'
 
-const fieldClass = 'h-12 rounded-xl border-border bg-background/40 md:h-10 md:rounded-sm'
+const fieldClass = 'h-[50px] rounded-xl border-border bg-background/40 pl-4 text-[13px] md:h-10 md:rounded-sm md:text-sm'
 
 interface LoginFormProps {
   onSuccess: () => void
@@ -80,11 +80,11 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
         <FieldError id="login-password-error" message={form.formState.errors.password?.message} />
       </div>
 
-      <p className="text-right text-sm text-accent-text">
-        <ComingSoon>Esqueceu a senha?</ComingSoon>
+      <p className="text-right text-[13px] text-accent-text">
+        <ComingSoon muted={false}>Esqueceu a senha?</ComingSoon>
       </p>
 
-      <Button type="submit" disabled={login.isPending} className="h-12 w-full text-base md:h-11 md:text-sm">
+      <Button type="submit" disabled={login.isPending} className="mt-7 h-[60px] w-full rounded-xl text-base md:mt-3 md:h-[45px] md:rounded-sm">
         {login.isPending ? 'Entrando…' : 'Entrar'}
       </Button>
     </form>
