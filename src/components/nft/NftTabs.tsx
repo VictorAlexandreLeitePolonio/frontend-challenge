@@ -8,7 +8,7 @@ interface NftTabsProps {
 }
 
 const triggerClass =
-  'h-auto flex-none border-0 px-0 pt-0 pb-3 text-sm leading-4 font-bold text-muted-foreground after:bg-primary group-data-horizontal/tabs:after:bottom-0 data-active:text-accent-text'
+  'h-auto flex-none border-0 px-0 pt-0 pb-3 text-sm leading-4 font-bold text-muted-foreground after:bg-primary group-data-horizontal/tabs:after:bottom-0! data-active:text-accent-text'
 
 export function NftTabs({ nft }: NftTabsProps) {
   return (
