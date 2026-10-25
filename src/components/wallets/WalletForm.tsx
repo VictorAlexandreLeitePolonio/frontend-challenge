@@ -85,6 +85,16 @@ export function WalletForm({ slot, wallet, onSaved, onCancel }: WalletFormProps)
     defaultValues: defaultsFor(wallet),
   })
   const pending = createWallet.isPending || updateWallet.isPending
+  const displayNameId = `wallet-${slot}-display-name`
+  const nicknameId = `wallet-${slot}-nickname`
+  const networkId = `wallet-${slot}-network`
+  const profileNameId = `wallet-${slot}-profile-name`
+  const addressId = `wallet-${slot}-address`
+  const secondaryAddressId = `wallet-${slot}-secondary-address`
+  const providerId = `wallet-${slot}-provider`
+  const referralId = `wallet-${slot}-referral`
+  const emailId = `wallet-${slot}-email`
+  const ensId = `wallet-${slot}-ens`
 
   const onSubmit = form.handleSubmit((values) => {
     setFormError(null)
@@ -111,28 +121,28 @@ export function WalletForm({ slot, wallet, onSaved, onCancel }: WalletFormProps)
       )}
 
       <div className="grid gap-7 md:grid-cols-2">
-        <Field id="wallet-display-name" label="Nome de exibição" error={form.formState.errors.displayName?.message}>
+        <Field id={displayNameId} label="Nome de exibição" error={form.formState.errors.displayName?.message}>
           <Input
-            id="wallet-display-name"
+            id={displayNameId}
             autoComplete="name"
             className={fieldClass}
             aria-invalid={Boolean(form.formState.errors.displayName)}
-            aria-describedby={form.formState.errors.displayName ? 'wallet-display-name-error' : undefined}
+            aria-describedby={form.formState.errors.displayName ? `${displayNameId}-error` : undefined}
             {...form.register('displayName')}
           />
         </Field>
 
-        <Field id="wallet-nickname" label="Apelido da carteira" error={form.formState.errors.nickname?.message}>
+        <Field id={nicknameId} label="Apelido da carteira" error={form.formState.errors.nickname?.message}>
           <Input
-            id="wallet-nickname"
+            id={nicknameId}
             className={fieldClass}
             aria-invalid={Boolean(form.formState.errors.nickname)}
-            aria-describedby={form.formState.errors.nickname ? 'wallet-nickname-error' : undefined}
+            aria-describedby={form.formState.errors.nickname ? `${nicknameId}-error` : undefined}
             {...form.register('nickname')}
           />
         </Field>
 
-        <Field id="wallet-network" label="Rede" error={form.formState.errors.network?.message}>
+        <Field id={networkId} label="Rede" error={form.formState.errors.network?.message}>
           <Controller
             control={form.control}
             name="network"
@@ -145,11 +155,11 @@ export function WalletForm({ slot, wallet, onSaved, onCancel }: WalletFormProps)
                 }}
               >
                 <SelectTrigger
-                  id="wallet-network"
+                  id={networkId}
                   onBlur={field.onBlur}
                   className={selectClass}
                   aria-invalid={Boolean(fieldState.error)}
-                  aria-describedby={fieldState.error ? 'wallet-network-error' : undefined}
+                  aria-describedby={fieldState.error ? `${networkId}-error` : undefined}
                 >
                   <SelectValue placeholder="Selecione uma rede" />
                 </SelectTrigger>
@@ -165,43 +175,43 @@ export function WalletForm({ slot, wallet, onSaved, onCancel }: WalletFormProps)
           />
         </Field>
 
-        <Field id="wallet-profile-name" label="Nome do perfil" error={form.formState.errors.profileName?.message}>
+        <Field id={profileNameId} label="Nome do perfil" error={form.formState.errors.profileName?.message}>
           <Input
-            id="wallet-profile-name"
+            id={profileNameId}
             className={fieldClass}
             aria-invalid={Boolean(form.formState.errors.profileName)}
-            aria-describedby={form.formState.errors.profileName ? 'wallet-profile-name-error' : undefined}
+            aria-describedby={form.formState.errors.profileName ? `${profileNameId}-error` : undefined}
             {...form.register('profileName')}
           />
         </Field>
 
-        <Field id="wallet-address" label="Endereço da carteira" error={form.formState.errors.address?.message}>
+        <Field id={addressId} label="Endereço da carteira" error={form.formState.errors.address?.message}>
           <Input
-            id="wallet-address"
+            id={addressId}
             placeholder="Endereço 0x da carteira"
             className={fieldClass}
             aria-invalid={Boolean(form.formState.errors.address)}
-            aria-describedby={form.formState.errors.address ? 'wallet-address-error' : undefined}
+            aria-describedby={form.formState.errors.address ? `${addressId}-error` : undefined}
             {...form.register('address')}
           />
         </Field>
 
         <div className="flex flex-col justify-end gap-1.5">
-          <Label htmlFor="wallet-secondary-address" className="sr-only">
+          <Label htmlFor={secondaryAddressId} className="sr-only">
             ENS ou carteira secundária (opcional)
           </Label>
           <Input
-            id="wallet-secondary-address"
+            id={secondaryAddressId}
             placeholder="ENS ou carteira secundária (opcional)"
             className={fieldClass}
             aria-invalid={Boolean(form.formState.errors.secondaryAddress)}
-            aria-describedby={form.formState.errors.secondaryAddress ? 'wallet-secondary-address-error' : undefined}
+            aria-describedby={form.formState.errors.secondaryAddress ? `${secondaryAddressId}-error` : undefined}
             {...form.register('secondaryAddress')}
           />
           <FieldError id="wallet-secondary-address-error" message={form.formState.errors.secondaryAddress?.message} />
         </div>
 
-        <Field id="wallet-provider" label="Tipo de carteira" error={form.formState.errors.provider?.message}>
+        <Field id={providerId} label="Tipo de carteira" error={form.formState.errors.provider?.message}>
           <Controller
             control={form.control}
             name="provider"
@@ -214,11 +224,11 @@ export function WalletForm({ slot, wallet, onSaved, onCancel }: WalletFormProps)
                 }}
               >
                 <SelectTrigger
-                  id="wallet-provider"
+                  id={providerId}
                   onBlur={field.onBlur}
                   className={selectClass}
                   aria-invalid={Boolean(fieldState.error)}
-                  aria-describedby={fieldState.error ? 'wallet-provider-error' : undefined}
+                  aria-describedby={fieldState.error ? `${providerId}-error` : undefined}
                 >
                   <SelectValue placeholder="Selecione uma carteira" />
                 </SelectTrigger>
@@ -234,36 +244,36 @@ export function WalletForm({ slot, wallet, onSaved, onCancel }: WalletFormProps)
           />
         </Field>
 
-        <Field id="wallet-referral" label="Código de indicação" error={form.formState.errors.referralCode?.message}>
+        <Field id={referralId} label="Código de indicação" error={form.formState.errors.referralCode?.message}>
           <Input
-            id="wallet-referral"
+            id={referralId}
             className={fieldClass}
             aria-invalid={Boolean(form.formState.errors.referralCode)}
-            aria-describedby={form.formState.errors.referralCode ? 'wallet-referral-error' : undefined}
+            aria-describedby={form.formState.errors.referralCode ? `${referralId}-error` : undefined}
             {...form.register('referralCode')}
           />
         </Field>
 
-        <Field id="wallet-email" label="E-mail" error={form.formState.errors.email?.message}>
+        <Field id={emailId} label="E-mail" error={form.formState.errors.email?.message}>
           <Input
-            id="wallet-email"
+            id={emailId}
             type="email"
             autoComplete="email"
             className={fieldClass}
             aria-invalid={Boolean(form.formState.errors.email)}
-            aria-describedby={form.formState.errors.email ? 'wallet-email-error' : undefined}
+            aria-describedby={form.formState.errors.email ? `${emailId}-error` : undefined}
             {...form.register('email')}
           />
         </Field>
 
-        <Field id="wallet-ens" label="Nome ENS" error={form.formState.errors.ensName?.message}>
+        <Field id={ensId} label="Nome ENS" error={form.formState.errors.ensName?.message}>
           <div className="relative">
             <Input
-              id="wallet-ens"
+              id={ensId}
               placeholder="seunome"
               className={`${fieldClass} pr-14`}
               aria-invalid={Boolean(form.formState.errors.ensName)}
-              aria-describedby={form.formState.errors.ensName ? 'wallet-ens-error' : undefined}
+              aria-describedby={form.formState.errors.ensName ? `${ensId}-error` : undefined}
               {...form.register('ensName')}
             />
             <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground" aria-hidden="true">
