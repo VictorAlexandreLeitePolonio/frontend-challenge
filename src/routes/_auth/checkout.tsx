@@ -213,6 +213,10 @@ function CheckoutContent({ cart, wallets, profile, user }: CheckoutContentProps)
   }
 
   const handleReview = (values: CheckoutFormValues) => {
+    if (unconfirmedAttempt) {
+      setNotice('Conclua a tentativa de compra anterior com "Tentar novamente" antes de revisar outro pedido.')
+      return
+    }
     if (!selectedWallet) {
       setNotice('Selecione uma carteira para revisar o pedido.')
       return
@@ -298,17 +302,20 @@ function CheckoutContent({ cart, wallets, profile, user }: CheckoutContentProps)
     void placeOrder.retry().catch((error: unknown) => handlePlaceOrderError(error, quote))
   }
 
-  const reason = !selectedWallet
-    ? 'Selecione uma carteira para continuar.'
-    : !selectedWallet.connected
-      ? 'Conecte a carteira selecionada para continuar.'
-      : blockedItem
-        ? 'Ajuste os itens indisponíveis no carrinho para continuar.'
-        : null
-  const canProceed = reason === null
   const placeError = placeOrder.error
   const uncertain = placeError instanceof ApiError && (placeError.isTimeout || placeError.isNetwork || placeError.status >= 500)
   const unconfirmedAttempt = Boolean(placeOrder.attempt && !placeOrder.attempt.orderId)
+  const unresolvedAttempt = unconfirmedAttempt && !placeOrder.isPending
+  const reason = unresolvedAttempt
+    ? 'Conclua a tentativa de compra anterior com "Tentar novamente" antes de revisar outro pedido.'
+    : !selectedWallet
+      ? 'Selecione uma carteira para continuar.'
+      : !selectedWallet.connected
+        ? 'Conecte a carteira selecionada para continuar.'
+        : blockedItem
+          ? 'Ajuste os itens indisponíveis no carrinho para continuar.'
+          : null
+  const canProceed = reason === null
   const busy = createQuote.isPending || placeOrder.isPending
 
   return (
@@ -413,7 +420,7 @@ function CheckoutContent({ cart, wallets, profile, user }: CheckoutContentProps)
               <Button
                 type="submit"
                 form={FORM_ID}
-                disabled={!canProceed || createQuote.isPending}
+                disabled={!canProceed || createQuote.isPending || placeOrder.isPending}
                 aria-describedby={reason ? REASON_ID : undefined}
                 className="h-12 w-full rounded-full md:h-10 md:rounded-sm"
               >
