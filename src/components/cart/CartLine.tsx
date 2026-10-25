@@ -62,7 +62,7 @@ export function CartLine({ item }: CartLineProps) {
       type="button"
       onClick={handleRemove}
       disabled={removeItem.isPending}
-      aria-label={`Remover ${item.name} do carrinho`}
+      aria-label={removeItem.isPending ? `Removendo ${item.name} do carrinho` : `Remover ${item.name} do carrinho`}
       className="grid size-9 place-items-center rounded-sm text-muted-foreground transition-colors hover:bg-background/40 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
     >
       {removeItem.isPending ? (
