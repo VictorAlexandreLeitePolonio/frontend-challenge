@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useNavigate } from '@tanstack/react-router'
 import { AlertTriangle } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -13,17 +12,15 @@ import { useLogin } from '@/hooks/useSession'
 import { loginInputSchema, type LoginInput } from '@/schemas/auth'
 import { applyApiFieldErrors } from './api-field-errors'
 import { PasswordInput } from './PasswordInput'
-import { safeRedirect } from './safe-redirect'
 
 const fieldClass = 'h-12 rounded-xl border-border bg-background/40 md:h-10 md:rounded-sm'
 
 interface LoginFormProps {
-  redirect?: string
+  onSuccess: () => void
 }
 
-export function LoginForm({ redirect }: LoginFormProps) {
+export function LoginForm({ onSuccess }: LoginFormProps) {
   const login = useLogin()
-  const navigate = useNavigate()
   const [formError, setFormError] = useState<string | null>(null)
   const form = useForm<LoginInput>({
     resolver: zodResolver(loginInputSchema),
@@ -33,7 +30,7 @@ export function LoginForm({ redirect }: LoginFormProps) {
   const onSubmit = form.handleSubmit((values) => {
     setFormError(null)
     login.mutate(values, {
-      onSuccess: () => void navigate({ href: safeRedirect(redirect), replace: true }),
+      onSuccess,
       onError: (error) => {
         const applied = applyApiFieldErrors(error, form.setError, ['email', 'password'])
         if (!applied) setFormError(errorMessage(error, 'Não foi possível entrar. Tente novamente.'))

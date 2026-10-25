@@ -1,33 +1,9 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
-import { AuthFrame } from '@/components/auth/AuthFrame'
-import { LoginForm } from '@/components/auth/LoginForm'
+import { createFileRoute } from '@tanstack/react-router'
+import { AuthBackdrop } from '@/components/auth/AuthBackdrop'
 import { redirectSearchSchema } from '@/lib/redirect'
 
+/** O diálogo de login é renderizado pela raiz; esta rota só mostra a página atrás dele. */
 export const Route = createFileRoute('/login')({
   validateSearch: redirectSearchSchema,
-  component: Page,
+  component: AuthBackdrop,
 })
-
-function Page() {
-  const { redirect } = Route.useSearch()
-
-  return (
-    <AuthFrame
-      mode="login"
-      redirect={redirect}
-      dialogTitle="Entrar na Kurio"
-      mobileTitle="Entrar"
-      subtitle="Entre para gerenciar sua carteira, coleção e perfil de criador."
-      footer={
-        <p>
-          Novo na Kurio?{' '}
-          <Link to="/signup" search={{ redirect }} className="text-accent-text hover:underline">
-            Crie uma conta
-          </Link>
-        </p>
-      }
-    >
-      <LoginForm redirect={redirect} />
-    </AuthFrame>
-  )
-}

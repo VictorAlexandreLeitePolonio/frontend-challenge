@@ -1,7 +1,9 @@
 import { useQueryClient, type QueryClient } from '@tanstack/react-query'
-import { createRootRouteWithContext, Link, Outlet, useRouter } from '@tanstack/react-router'
+import { createRootRouteWithContext, Link, Outlet, useLocation, useRouter } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
+import { z } from 'zod'
+import { AuthDialog, authPathMode } from '@/components/auth/AuthDialog'
 import { DevPanel } from '@/components/layout/DevPanel'
 import { Footer } from '@/components/layout/Footer'
 import { Header } from '@/components/layout/Header'
@@ -10,10 +12,17 @@ import { PageContainer } from '@/components/layout/PageContainer'
 import { Button } from '@/components/ui/button'
 import { Toaster } from '@/components/ui/sonner'
 import { clearSession } from '@/hooks/useSession'
+import { redirectSearchSchema } from '@/lib/redirect'
 import { sessionEvents } from '@/lib/session-events'
 import { useRealtimeSync } from '@/realtime/useRealtimeSync'
 
+/** `?auth=login|signup` abre o diálogo sobre qualquer página; `redirect` é o destino pós-login. */
+const rootSearchSchema = redirectSearchSchema.extend({
+  auth: z.enum(['login', 'signup']).optional().catch(undefined),
+})
+
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  validateSearch: rootSearchSchema,
   component: RootLayout,
   notFoundComponent: NotFound,
 })
@@ -21,6 +30,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 function RootLayout() {
   useRealtimeSync()
   useSessionExpiry()
+  const { auth, redirect } = Route.useSearch()
+  const pathname = useLocation({ select: (location) => location.pathname })
+  const authMode = auth ?? authPathMode(pathname)
 
   return (
     <>
@@ -33,6 +45,7 @@ function RootLayout() {
       </main>
       <Footer />
       <MobileTabBar />
+      {authMode && <AuthDialog mode={authMode} redirect={redirect} />}
       <Toaster position="top-right" richColors closeButton />
       <DevPanel />
     </>

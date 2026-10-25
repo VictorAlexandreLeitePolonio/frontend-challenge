@@ -1,34 +1,41 @@
 import { Link } from '@tanstack/react-router'
 import { cn } from '@/lib/utils'
 
+export type AuthMode = 'login' | 'signup'
+
 interface AuthTabsProps {
-  mode: 'login' | 'signup'
-  redirect?: string
+  mode: AuthMode
 }
 
 const tab = 'border-b-2 border-transparent pb-1 text-base tracking-wide transition-colors hover:text-accent-text'
 const activeTab = 'border-primary font-bold text-primary'
 
-export function AuthTabs({ mode, redirect }: AuthTabsProps) {
+export function AuthTabs({ mode }: AuthTabsProps) {
   return (
     <nav aria-label="Acesso à conta" className="flex items-center justify-center gap-3">
-      <Link
-        to="/login"
-        search={{ redirect }}
-        aria-current={mode === 'login' ? 'page' : undefined}
-        className={cn(tab, mode === 'login' && activeTab, mode !== 'login' && 'text-foreground')}
-      >
+      <AuthModeLink mode="login" current={mode === 'login'} className={cn(tab, mode === 'login' ? activeTab : 'text-foreground')}>
         Entrar
-      </Link>
+      </AuthModeLink>
       <span className="h-5 w-px bg-border-soft" aria-hidden="true" />
-      <Link
-        to="/signup"
-        search={{ redirect }}
-        aria-current={mode === 'signup' ? 'page' : undefined}
-        className={cn(tab, mode === 'signup' && activeTab, mode !== 'signup' && 'text-foreground')}
-      >
+      <AuthModeLink mode="signup" current={mode === 'signup'} className={cn(tab, mode === 'signup' ? activeTab : 'text-foreground')}>
         Criar conta
-      </Link>
+      </AuthModeLink>
     </nav>
+  )
+}
+
+interface AuthModeLinkProps {
+  mode: AuthMode
+  current?: boolean
+  className?: string
+  children: React.ReactNode
+}
+
+/** Troca o modo na mesma rota (`?auth=`), preservando o redirect. */
+export function AuthModeLink({ mode, current = false, className, children }: AuthModeLinkProps) {
+  return (
+    <Link to="." search={(prev) => ({ ...prev, auth: mode })} aria-current={current ? 'page' : undefined} className={className}>
+      {children}
+    </Link>
   )
 }

@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useNavigate } from '@tanstack/react-router'
 import { AlertTriangle } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -12,18 +11,16 @@ import { useRegister } from '@/hooks/useSession'
 import { registerInputSchema, type RegisterInput } from '@/schemas/auth'
 import { applyApiFieldErrors } from './api-field-errors'
 import { PasswordInput } from './PasswordInput'
-import { safeRedirect } from './safe-redirect'
 
 const fieldClass = 'h-12 rounded-xl border-border bg-background/40 md:h-10 md:rounded-sm'
 const fields = ['username', 'email', 'password', 'confirmPassword'] as const
 
 interface SignupFormProps {
-  redirect?: string
+  onSuccess: () => void
 }
 
-export function SignupForm({ redirect }: SignupFormProps) {
+export function SignupForm({ onSuccess }: SignupFormProps) {
   const registerAccount = useRegister()
-  const navigate = useNavigate()
   const [formError, setFormError] = useState<string | null>(null)
   const form = useForm<RegisterInput>({
     resolver: zodResolver(registerInputSchema),
@@ -33,7 +30,7 @@ export function SignupForm({ redirect }: SignupFormProps) {
   const onSubmit = form.handleSubmit((values) => {
     setFormError(null)
     registerAccount.mutate(values, {
-      onSuccess: () => void navigate({ href: safeRedirect(redirect), replace: true }),
+      onSuccess,
       onError: (error) => {
         const applied = applyApiFieldErrors(error, form.setError, fields)
         if (!applied) setFormError(errorMessage(error, 'Não foi possível criar sua conta. Tente novamente.'))
