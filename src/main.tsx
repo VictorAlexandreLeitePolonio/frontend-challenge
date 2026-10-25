@@ -7,7 +7,8 @@ import './styles.css'
  */
 async function bootstrap() {
   // Sequencial de propósito: sob rede lenta, baixar app e MSW juntos divide a banda e atrasa o LCP.
-  if (import.meta.env.VITE_ENABLE_MOCKS === 'true') {
+  // Ligado por padrão (CI, Vercel e clones sem .env); um backend real desliga com VITE_ENABLE_MOCKS=false.
+  if (import.meta.env.VITE_ENABLE_MOCKS !== 'false') {
     const { startMocks } = await import('./mocks/browser')
     await startMocks()
   }
