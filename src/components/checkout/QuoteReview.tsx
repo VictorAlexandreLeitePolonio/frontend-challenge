@@ -51,7 +51,7 @@ export function QuoteReview({ quote }: QuoteReviewProps) {
               </div>
               <div className="flex shrink-0 flex-col items-end gap-1 text-right">
                 <span className="text-xs text-muted-foreground">(x {item.quantity})</span>
-                <EthPrice value={item.lineTotal} className="text-sm" />
+                <EthPrice value={item.lineTotal} className="text-sm text-accent-text" />
               </div>
             </li>
           ))}

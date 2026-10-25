@@ -6,11 +6,11 @@ export function CheckoutSkeleton() {
       <p role="status" className="sr-only">
         Carregando pagamento…
       </p>
-      <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_332px] xl:gap-x-[86px]">
+      <div className="grid gap-8 md:mt-6 xl:grid-cols-[minmax(0,1fr)_332px] xl:gap-x-[86px]">
         <div className="flex flex-col gap-6">
           <Skeleton className="h-5 w-52" />
           <div className="grid gap-5 md:grid-cols-2">
-            {Array.from({ length: 4 }, (_, index) => (
+            {Array.from({ length: 10 }, (_, index) => (
               <div key={index} className="flex flex-col gap-2">
                 <Skeleton className="h-4 w-32" />
                 <Skeleton className="h-11 w-full md:h-10" />
@@ -18,7 +18,11 @@ export function CheckoutSkeleton() {
             ))}
             <div className="flex flex-col gap-2 md:col-span-2">
               <Skeleton className="h-4 w-64" />
-              <Skeleton className="h-28 w-full" />
+              <Skeleton className="h-4 w-20" />
+            </div>
+            <div className="flex flex-col gap-2 md:col-span-1">
+              <Skeleton className="h-4 w-56" />
+              <Skeleton className="h-[150px] w-full" />
             </div>
           </div>
         </div>
