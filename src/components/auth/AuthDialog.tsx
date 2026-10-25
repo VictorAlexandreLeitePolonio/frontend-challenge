@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useLocation, useNavigate } from '@tanstack/react-router'
 import { X } from 'lucide-react'
 import { Dialog as DialogPrimitive } from 'radix-ui'
@@ -32,6 +33,9 @@ const COPY: Record<AuthMode, { title: string; mobileTitle: string; subtitle: str
 }
 
 /** Altura fixa do modal desktop no Figma (login 600px, cadastro 656px). */
+/** Duração da animação de saída do diálogo (ms), igual ao `duration-200` do conteúdo. */
+const EXIT_MS = 200
+
 const DESKTOP_HEIGHT: Record<AuthMode, string> = { login: 'min-h-[600px]', signup: 'min-h-[656px]' }
 
 interface AuthDialogProps {
@@ -46,20 +50,32 @@ export function AuthDialog({ mode, redirect }: AuthDialogProps) {
   const isDesktop = useIsDesktop()
   const copy = COPY[mode]
 
+  const [open, setOpen] = useState(true)
+
+  // Duas fases: anima a saída (open=false) e só então muda a URL, que desmonta o diálogo.
+  const leave = (target: string) => {
+    setOpen(false)
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    window.setTimeout(() => void navigate({ href: target, replace: true }), reduced ? 0 : EXIT_MS)
+  }
   // Fechar só tira o diálogo: a página atrás é sempre pública, então não há loop com o guard.
-  const close = () => navigate({ href: withoutAuth(href), replace: true })
+  const close = () => leave(withoutAuth(href))
   // Depois de logar: vai ao destino quando há redirect; senão permanece na página.
-  const finish = () => (redirect ? navigate({ href: safeRedirect(redirect), replace: true }) : close())
+  const finish = () => leave(redirect ? safeRedirect(redirect) : withoutAuth(href))
 
   const form = mode === 'login' ? <LoginForm onSuccess={finish} /> : <SignupForm onSuccess={finish} />
 
   return (
-    <DialogPrimitive.Root open onOpenChange={(open) => !open && close()}>
+    <DialogPrimitive.Root open={open} onOpenChange={(next) => !next && close()}>
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className="fixed inset-0 z-50" />
         <DialogPrimitive.Content
           className={cn(
             'fixed z-50 flex flex-col overflow-y-auto bg-card text-foreground outline-none',
+            'duration-200 ease-out motion-reduce:animate-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0',
+            isDesktop
+              ? 'data-[state=open]:zoom-in-95 data-[state=open]:slide-in-from-bottom-3 data-[state=closed]:zoom-out-95 data-[state=closed]:slide-out-to-bottom-3'
+              : 'data-[state=open]:slide-in-from-bottom-8 data-[state=closed]:slide-out-to-bottom-8',
             isDesktop
               ? cn('top-1/2 left-1/2 max-h-[calc(100dvh-2rem)] w-[500px] max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2', DESKTOP_HEIGHT[mode])
               : 'inset-0 h-dvh bg-background',

@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { ArrowLeft } from 'lucide-react'
+import { ChevronLeft } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface MobileBackLinkProps {
@@ -14,11 +14,11 @@ export function MobileBackLink({ to, label, className }: MobileBackLinkProps) {
       to={to}
       aria-label={label}
       className={cn(
-        'grid size-9 shrink-0 place-items-center rounded-full bg-card text-foreground transition-colors hover:text-accent-text',
+        'grid size-[34px] shrink-0 place-items-center rounded-full border border-border bg-card text-accent-text transition-colors hover:text-primary',
         className,
       )}
     >
-      <ArrowLeft className="size-4" aria-hidden="true" />
+      <ChevronLeft className="size-5" aria-hidden="true" />
     </Link>
   )
 }

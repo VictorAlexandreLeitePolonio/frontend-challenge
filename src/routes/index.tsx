@@ -88,7 +88,7 @@ function Page() {
           </aside>
 
           <div className="min-w-0">
-            <div className="flex flex-col gap-5 md:flex-row md:flex-wrap md:items-center md:justify-between md:gap-0 xl:flex-nowrap">
+            <div className="flex flex-col gap-5 md:mb-6 md:flex-row md:flex-wrap md:items-center md:justify-between md:gap-x-10 md:gap-y-4 xl:flex-nowrap">
               <CatalogTabs value={tab} onChange={changeTab} />
               <CatalogSort
                 value={search.sort ?? 'recent'}

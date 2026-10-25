@@ -121,10 +121,9 @@ function CheckoutShell({ children }: { children: React.ReactNode }) {
       <div className="hidden md:block">
         <PageBreadcrumbs current="Pagamento" />
       </div>
-      <header className="mb-3 flex h-11 items-center justify-between gap-3 md:hidden">
+      <header className="mb-7 flex h-11 items-center gap-6 md:hidden">
         <MobileBackLink to="/cart" label="Voltar ao carrinho" />
-        <h1 className="flex-1 text-center text-xl font-bold">Pagamento</h1>
-        <span className="size-9 shrink-0" aria-hidden="true" />
+        <h1 className="text-lg font-bold whitespace-nowrap min-[400px]:text-xl">Pagamento com carteira</h1>
       </header>
       <h1 className="sr-only hidden md:block">Pagamento</h1>
       {children}

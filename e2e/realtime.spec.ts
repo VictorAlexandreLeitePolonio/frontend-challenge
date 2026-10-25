@@ -9,7 +9,8 @@ test('preço alterado via Socket.IO durante o checkout exige nova revisão', asy
   await page.evaluate(() => window.__kurioMock?.changePrice('emerald-ape-042', '1/50', '1.50'))
   await expect(page.getByText('Revise o pedido novamente').first()).toBeVisible()
   await expect(page.getByRole('button', { name: 'Confirmar compra' })).toHaveCount(0)
-  await expect(page.getByText('1.50 ETH').first()).toBeVisible()
+  // desktop mostra a linha do item (1.50 ETH); o mobile do Figma só mostra o total (1.516 ETH)
+  await expect(page.getByText(/^1\.5\d* ETH$/).filter({ visible: true }).first()).toBeVisible()
   expect(await serverOrders(page)).toEqual([])
 })
 

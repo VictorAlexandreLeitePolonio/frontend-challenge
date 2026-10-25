@@ -15,7 +15,7 @@ interface CatalogSortProps {
 export function CatalogSort({ value, onChange, layout = 'inline', className }: CatalogSortProps) {
   const id = useId()
   return (
-    <div className={cn(layout === 'stacked' ? 'flex w-full flex-col items-start gap-1' : 'flex items-center', className)}>
+    <div className={cn(layout === 'stacked' ? 'flex w-full flex-col items-start gap-1' : 'flex shrink-0 items-center gap-2', className)}>
       <Label htmlFor={id} className="shrink-0 text-sm font-normal text-foreground">
         Ordenar por:
       </Label>
@@ -30,7 +30,7 @@ export function CatalogSort({ value, onChange, layout = 'inline', className }: C
           id={id}
           className={cn(
             'h-8 rounded-none border-0 bg-transparent px-0 text-sm focus-visible:ring-0',
-            layout === 'stacked' ? 'w-full' : 'w-[190px]',
+            layout === 'stacked' ? 'w-full' : 'w-auto gap-2 whitespace-nowrap',
           )}
         >
           <SelectValue />

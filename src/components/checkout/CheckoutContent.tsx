@@ -1,10 +1,12 @@
 import { Link } from '@tanstack/react-router'
 import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useIsDesktop } from '@/components/auth/useIsDesktop'
 import { CheckoutForm } from './CheckoutForm'
 import { CheckoutSidebar } from './CheckoutSidebar'
 import { PlaceErrorPanel, ReviewErrorPanel } from './CheckoutErrorPanels'
 import { QuoteDiff } from './QuoteDiff'
+import { MobileCheckout } from './MobileCheckout'
 import { QuoteReview } from './QuoteReview'
 import { useCheckoutFlow } from './useCheckoutFlow'
 import type { Cart } from '@/schemas/cart'
@@ -26,6 +28,9 @@ export function CheckoutContent({ cart, wallets, profile, user }: CheckoutConten
   const flow = useCheckoutFlow({ cart, wallets, profile, user })
   const showPlaceError = Boolean(flow.placeError || flow.unconfirmedAttempt)
   const placeUncertain = !flow.placeError || flow.uncertain
+  const isDesktop = useIsDesktop()
+
+  if (!isDesktop) return <MobileCheckout cart={cart} wallets={wallets} flow={flow} />
 
   return (
     <div
