@@ -82,7 +82,7 @@ export function RelatedNfts({ collection, currentNftId }: RelatedNftsProps) {
           </div>
 
           {items.length > 1 && (
-            <div className="mt-5 flex justify-center gap-2 md:hidden">
+            <div className="mt-4 flex justify-center md:hidden">
               {items.map((nft, index) => (
                 <button
                   key={nft.id}
@@ -91,11 +91,16 @@ export function RelatedNfts({ collection, currentNftId }: RelatedNftsProps) {
                   aria-pressed={index === active}
                   aria-controls={scrollerId}
                   onClick={() => scrollTo(index)}
-                  className={cn(
-                    'size-2.5 rounded-full border border-primary transition-colors',
-                    index === active ? 'bg-primary' : 'bg-transparent',
-                  )}
-                />
+                  className="grid size-6 place-items-center"
+                >
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      'size-2.5 rounded-full border border-primary transition-colors',
+                      index === active ? 'bg-primary' : 'bg-transparent',
+                    )}
+                  />
+                </button>
               ))}
             </div>
           )}

@@ -28,7 +28,7 @@ function RootLayout() {
         Pular para o conteúdo
       </a>
       <Header />
-      <main id="conteudo" className="min-h-[60vh] pb-28 md:pb-0">
+      <main id="conteudo" className="min-h-screen pb-28 md:pb-0">
         <Outlet />
       </main>
       <Footer />

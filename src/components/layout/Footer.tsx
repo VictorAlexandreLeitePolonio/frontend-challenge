@@ -76,7 +76,7 @@ export function Footer() {
           <h2 className="text-lg font-bold">Redes sociais</h2>
           <ul className="flex gap-2" aria-label="Redes sociais (em breve)">
             {['f', 'ig', 'x', 'in', 'yt'].map((label) => (
-              <li key={label} className="grid size-8 place-items-center border border-primary text-xs font-bold text-primary opacity-60" aria-hidden="true">
+              <li key={label} className="grid size-8 place-items-center border border-primary text-xs font-bold text-primary" aria-hidden="true">
                 {label}
               </li>
             ))}

@@ -52,7 +52,7 @@ export function NftMobileHero({ nft, favorite, favoritePending, favoriteDisabled
       </div>
 
       {gallery.length > 1 && (
-        <div className="mt-4 flex justify-center gap-2">
+        <div className="mt-2 flex justify-center">
           {gallery.map((image, index) => (
             <button
               key={`${image}-${index}`}
@@ -60,11 +60,16 @@ export function NftMobileHero({ nft, favorite, favoritePending, favoriteDisabled
               onClick={() => setActive(index)}
               aria-label={`Ver imagem ${index + 1} de ${gallery.length}`}
               aria-pressed={index === active}
-              className={cn(
-                'h-2.5 rounded-full border border-primary transition-all',
-                index === active ? 'w-5 bg-primary' : 'w-2.5 bg-transparent',
-              )}
-            />
+              className="grid h-6 min-w-6 place-items-center px-1"
+            >
+              <span
+                aria-hidden="true"
+                className={cn(
+                  'h-2.5 rounded-full border border-primary transition-all',
+                  index === active ? 'w-5 bg-primary' : 'w-2.5 bg-transparent',
+                )}
+              />
+            </button>
           ))}
         </div>
       )}

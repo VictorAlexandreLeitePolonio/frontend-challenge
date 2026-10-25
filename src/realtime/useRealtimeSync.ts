@@ -9,6 +9,7 @@ import { nftUpdatedEventSchema, orderUpdatedEventSchema } from '@/schemas/events
 import type { Nft } from '@/schemas/nft'
 import type { Order } from '@/schemas/order'
 import { realtimeEvents } from './events'
+import type { Socket } from 'socket.io-client'
 import { createSocket } from './socket'
 
 /**
@@ -22,7 +23,8 @@ export function useRealtimeSync() {
 
   useEffect(() => {
     if (isLoading) return
-    const socket = createSocket(tokenStore.get())
+    let socket: Socket | null = null
+    let disposed = false
     const seenEvents = new Set<string>()
     const lastVersion = new Map<string, number>()
     let hasConnected = false
@@ -37,63 +39,76 @@ export function useRealtimeSync() {
       return true
     }
 
-    socket.on('nft.updated', (payload: unknown) => {
-      const parsed = nftUpdatedEventSchema.safeParse(payload)
-      if (!parsed.success) return
-      const event = parsed.data
-      const nftId = event.resource.id
-      const cached = queryClient.getQueryData<Nft>(queryKeys.nft(nftId))
-      if (!isFresh(event.eventId, `nft:${nftId}`, event.version, cached?.version)) return
+    const bind = (socket: Socket) => {
+      socket.on('nft.updated', (payload: unknown) => {
+        const parsed = nftUpdatedEventSchema.safeParse(payload)
+        if (!parsed.success) return
+        const event = parsed.data
+        const nftId = event.resource.id
+        const cached = queryClient.getQueryData<Nft>(queryKeys.nft(nftId))
+        if (!isFresh(event.eventId, `nft:${nftId}`, event.version, cached?.version)) return
 
-      if (cached) queryClient.setQueryData<Nft>(queryKeys.nft(nftId), { ...cached, editions: event.data.editions, version: event.version })
-      queryClient.invalidateQueries({ queryKey: queryKeys.nft(nftId) })
-      queryClient.invalidateQueries({ queryKey: queryKeys.nftLists })
-
-      const cartKey = queryKeys.cart(userId ? `user:${userId}` : 'guest')
-      const cart = queryClient.getQueryData<Cart>(cartKey)
-      const inCart = cart?.items.find((item) => item.nftId === nftId)
-      if (inCart) {
-        queryClient.invalidateQueries({ queryKey: cartKey })
-        toast.info(`${inCart.name}: preço ou disponibilidade atualizados. Revise o resumo.`)
-      }
-      realtimeEvents.emit('nft.updated', event)
-    })
-
-    socket.on('order.updated', (payload: unknown) => {
-      const parsed = orderUpdatedEventSchema.safeParse(payload)
-      if (!parsed.success || !userId) return
-      const event = parsed.data
-      const key = queryKeys.order(userId, event.resource.id)
-      const cached = queryClient.getQueryData<Order>(key)
-      if (!isFresh(event.eventId, `order:${event.resource.id}`, event.version, cached?.version)) return
-
-      if (cached) queryClient.setQueryData<Order>(key, { ...cached, status: event.data.status, version: event.version })
-      queryClient.invalidateQueries({ queryKey: key })
-
-      if (event.data.status !== 'pending') {
-        const store = pendingOrderStore(userId)
-        if (store.get()?.orderId === event.resource.id) store.set(null)
-        queryClient.invalidateQueries({ queryKey: queryKeys.cart(`user:${userId}`) })
-        if (event.data.status === 'confirmed') toast.success('Pagamento confirmado! Seus NFTs estão na sua carteira.')
-        else toast.error('Pagamento recusado. Seus itens continuam no carrinho.')
-      }
-      realtimeEvents.emit('order.updated', event)
-    })
-
-    // Reconexão: eventos perdidos durante a queda são reconciliados com a API REST.
-    socket.on('connect', () => {
-      if (hasConnected) {
+        if (cached) queryClient.setQueryData<Nft>(queryKeys.nft(nftId), { ...cached, editions: event.data.editions, version: event.version })
+        queryClient.invalidateQueries({ queryKey: queryKeys.nft(nftId) })
         queryClient.invalidateQueries({ queryKey: queryKeys.nftLists })
-        queryClient.invalidateQueries({ queryKey: ['nft'] })
-        queryClient.invalidateQueries({ queryKey: ['cart'] })
-        if (userId) queryClient.invalidateQueries({ queryKey: queryKeys.orders(userId) })
+
+        const cartKey = queryKeys.cart(userId ? `user:${userId}` : 'guest')
+        const cart = queryClient.getQueryData<Cart>(cartKey)
+        const inCart = cart?.items.find((item) => item.nftId === nftId)
+        if (inCart) {
+          queryClient.invalidateQueries({ queryKey: cartKey })
+          toast.info(`${inCart.name}: preço ou disponibilidade atualizados. Revise o resumo.`)
+        }
+        realtimeEvents.emit('nft.updated', event)
+      })
+
+      socket.on('order.updated', (payload: unknown) => {
+        const parsed = orderUpdatedEventSchema.safeParse(payload)
+        if (!parsed.success || !userId) return
+        const event = parsed.data
+        const key = queryKeys.order(userId, event.resource.id)
+        const cached = queryClient.getQueryData<Order>(key)
+        if (!isFresh(event.eventId, `order:${event.resource.id}`, event.version, cached?.version)) return
+
+        if (cached) queryClient.setQueryData<Order>(key, { ...cached, status: event.data.status, version: event.version })
+        queryClient.invalidateQueries({ queryKey: key })
+
+        if (event.data.status !== 'pending') {
+          const store = pendingOrderStore(userId)
+          if (store.get()?.orderId === event.resource.id) store.set(null)
+          queryClient.invalidateQueries({ queryKey: queryKeys.cart(`user:${userId}`) })
+          if (event.data.status === 'confirmed') toast.success('Pagamento confirmado! Seus NFTs estão na sua carteira.')
+          else toast.error('Pagamento recusado. Seus itens continuam no carrinho.')
+        }
+        realtimeEvents.emit('order.updated', event)
+      })
+
+      // Reconexão: eventos perdidos durante a queda são reconciliados com a API REST.
+      socket.on('connect', () => {
+        if (hasConnected) {
+          queryClient.invalidateQueries({ queryKey: queryKeys.nftLists })
+          queryClient.invalidateQueries({ queryKey: ['nft'] })
+          queryClient.invalidateQueries({ queryKey: ['cart'] })
+          if (userId) queryClient.invalidateQueries({ queryKey: queryKeys.orders(userId) })
+        }
+        hasConnected = true
+      })
+
+    }
+
+    void createSocket(tokenStore.get()).then((created) => {
+      if (disposed) {
+        created.disconnect()
+        return
       }
-      hasConnected = true
+      socket = created
+      bind(created)
     })
 
     return () => {
-      socket.removeAllListeners()
-      socket.disconnect()
+      disposed = true
+      socket?.removeAllListeners()
+      socket?.disconnect()
     }
   }, [queryClient, userId, isLoading])
 }
