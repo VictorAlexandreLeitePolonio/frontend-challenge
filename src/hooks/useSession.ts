@@ -43,7 +43,7 @@ function useStartSession() {
         // ponytail: merge falhou, itens do visitante continuam no carrinho de visitante para nova tentativa no próximo login
       }
     }
-    queryClient.removeQueries({ predicate: (query) => query.queryKey[0] !== 'nfts' && query.queryKey[0] !== 'nft' })
+    removePrivateQueries(queryClient)
     queryClient.setQueryData(queryKeys.session, user)
   }
 }
@@ -64,10 +64,21 @@ export function useRegister() {
   })
 }
 
+const PUBLIC_QUERIES = new Set(['session', 'nfts', 'nft'])
+
+/**
+ * Remove dados privados do usuário anterior. A query de sessão NÃO é removida: ela tem
+ * observers ativos (root, header) e removê-la os deixaria presos a uma query órfã —
+ * a troca de usuário é feita com setQueryData sobre a mesma query.
+ */
+function removePrivateQueries(queryClient: ReturnType<typeof useQueryClient>) {
+  queryClient.removeQueries({ predicate: (query) => !PUBLIC_QUERIES.has(String(query.queryKey[0])) })
+}
+
 /** Encerra a sessão local mesmo se a API falhar. */
 export function clearSession(queryClient: ReturnType<typeof useQueryClient>) {
   tokenStore.set(null)
-  queryClient.clear()
+  removePrivateQueries(queryClient)
   queryClient.setQueryData(queryKeys.session, null)
 }
 

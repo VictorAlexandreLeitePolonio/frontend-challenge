@@ -4,7 +4,7 @@ import { db } from './db'
 import { findNft, nftUpdatedEvent } from './domain'
 import { changeEdition } from './effects'
 import { getScenario, SCENARIOS, setScenario, type ScenarioId } from './scenarios'
-import { deliverRaw, dropConnections, redeliverLastEvent } from './socket'
+import { connectedUsers, deliverRaw, dropConnections, redeliverLastEvent } from './socket'
 
 /**
  * Controles do "servidor" simulado para DevPanel e Playwright. Tudo passa pelo db e
@@ -53,6 +53,7 @@ export const mockControls = {
       data: { editions: nft.editions.map((edition) => ({ ...edition, price: '999.00' })) },
     })
   },
+  connectedUsers,
   cartFirstItem() {
     return db.state.carts.flatMap((cart) => cart.items)[0] ?? null
   },

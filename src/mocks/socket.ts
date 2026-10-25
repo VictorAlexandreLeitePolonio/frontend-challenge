@@ -51,6 +51,11 @@ export const socketHandler = realtime.addEventListener('connection', (connection
   })
 })
 
+/** Diagnóstico: usuário de cada conexão aberta (null = visitante). */
+export function connectedUsers() {
+  return [...clients].map((client) => client.userId)
+}
+
 export function dropConnections() {
   for (const client of clients) client.drop()
 }
