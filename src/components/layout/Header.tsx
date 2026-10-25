@@ -13,7 +13,7 @@ const navLink = 'relative py-2 text-[15px] tracking-wide transition-colors hover
 const activeLink = 'font-bold text-primary after:absolute after:inset-x-0 after:-bottom-[13px] after:h-0.5 after:bg-primary'
 
 export function Header() {
-  const { pathname, href } = useLocation()
+  const { pathname } = useLocation()
   const { user } = useSession()
   const cart = useCart()
   const logout = useLogout()
@@ -89,7 +89,7 @@ export function Header() {
             </DropdownMenu>
           ) : (
             <Button asChild>
-              <Link to="/login" search={{ redirect: href }}>
+              <Link to="." search={(prev) => ({ ...prev, auth: 'login' as const })}>
                 <LogIn aria-hidden="true" />
                 Entrar
               </Link>
