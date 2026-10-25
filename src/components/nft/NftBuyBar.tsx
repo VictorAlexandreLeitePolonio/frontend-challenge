@@ -18,27 +18,38 @@ export function NftBuyBar({ price, quantity, max, onQuantityChange, onBuy, isPen
   const soldOut = max <= 0
 
   return (
-    <div className="fixed inset-x-0 bottom-[88px] z-30 border-t border-border bg-card px-4 pt-3 pb-3 md:hidden">
+    <div className="fixed inset-x-0 bottom-0 z-40 rounded-t-[32px] border-t border-border bg-card px-6 pt-5 pb-[max(34px,env(safe-area-inset-bottom))] md:hidden">
       {error && (
         <p role="alert" className="mb-2 text-xs text-destructive">
           {error}
         </p>
       )}
-      <div className="flex items-end justify-between gap-4">
-        <NftQuantityStepper quantity={quantity} max={max} onChange={onQuantityChange} disabled={isPending} />
-        <EthPrice value={price} className="pb-5 text-base" />
+      <div className="flex h-[30px] items-center justify-between gap-4">
+        <NftQuantityStepper
+          variant="compact"
+          quantity={quantity}
+          max={max}
+          onChange={onQuantityChange}
+          disabled={isPending}
+        />
+        <EthPrice value={price} className="text-xl leading-6" />
       </div>
-      <div className="mt-2 flex gap-3">
+      <div className="mt-5 flex items-center gap-3">
         <Button
-          className="h-12 flex-1 rounded-full text-base"
+          className="h-[60px] w-[196px] rounded-full text-lg"
           onClick={onBuy}
           disabled={soldOut || isPending}
         >
           {soldOut ? 'Esgotado' : isPending ? 'Adicionando…' : 'Comprar NFT'}
         </Button>
-        <Button asChild variant="outline" size="icon" className="size-12 shrink-0 rounded-full">
+        <Button
+          asChild
+          variant="outline"
+          size="icon"
+          className="size-[60px] shrink-0 rounded-full border-border-soft bg-background/30 text-foreground"
+        >
           <Link to="/cart" aria-label="Ver carrinho">
-            <ShoppingCart aria-hidden="true" />
+            <ShoppingCart className="size-5" aria-hidden="true" />
           </Link>
         </Button>
       </div>

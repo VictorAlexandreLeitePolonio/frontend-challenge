@@ -30,12 +30,12 @@ export function RelatedNfts({ collection, currentNftId }: RelatedNftsProps) {
 
   return (
     <section aria-labelledby="related-title" className="mt-16 md:mt-24">
-      <h2 id="related-title" className="border-b border-border pb-4 text-base font-bold text-accent-text">
+      <h2 id="related-title" className="border-b border-border pb-3 text-base leading-4 font-bold text-accent-text">
         Mais desta coleção
       </h2>
 
       {query.isPending && (
-        <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-5">
+        <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-5 lg:gap-[26px]">
           {Array.from({ length: 5 }, (_, index) => (
             <NftCardSkeleton key={index} />
           ))}
@@ -72,7 +72,7 @@ export function RelatedNfts({ collection, currentNftId }: RelatedNftsProps) {
               })
               setActive(nearest)
             }}
-            className="relative mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 md:grid md:grid-cols-3 md:gap-6 md:overflow-visible lg:grid-cols-5"
+            className="relative mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 md:grid md:grid-cols-3 md:gap-6 md:overflow-visible lg:grid-cols-5 lg:gap-[26px]"
           >
             {items.map((nft) => (
               <div key={nft.id} className="w-[72%] shrink-0 snap-start sm:w-[44%] md:w-auto">
@@ -104,6 +104,18 @@ export function RelatedNfts({ collection, currentNftId }: RelatedNftsProps) {
               ))}
             </div>
           )}
+
+          <div className="mt-8 hidden justify-center gap-2 md:flex" aria-hidden="true">
+            {[0, 1, 2].map((dot) => (
+              <span
+                key={dot}
+                className={cn(
+                  'size-3 rounded-full border border-primary',
+                  dot === 0 ? 'bg-primary' : 'bg-transparent',
+                )}
+              />
+            ))}
+          </div>
         </>
       )}
     </section>

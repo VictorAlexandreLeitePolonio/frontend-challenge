@@ -1,6 +1,6 @@
 import { useId, useState } from 'react'
+import { Search } from 'lucide-react'
 import { nftImageProps } from '@/lib/images'
-import { cn } from '@/lib/utils'
 import type { Nft } from '@/schemas/nft'
 
 interface NftGalleryProps {
@@ -33,7 +33,7 @@ export function NftGallery({ nft }: NftGalleryProps) {
           move(1)
         }
       }}
-      className="hidden gap-7 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring md:grid md:grid-cols-[100px_minmax(0,1fr)]"
+      className="hidden items-start gap-7 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring md:grid md:grid-cols-[100px_minmax(0,1fr)]"
     >
       <p id={hintId} className="sr-only">
         Use as setas esquerda e direita para trocar a imagem.
@@ -46,10 +46,7 @@ export function NftGallery({ nft }: NftGalleryProps) {
             aria-pressed={index === active}
             aria-label={`Ver imagem ${index + 1} de ${gallery.length}`}
             onClick={() => setActive(index)}
-            className={cn(
-              'overflow-hidden rounded-lg border-2 transition-colors',
-              index === active ? 'border-primary' : 'border-transparent hover:border-border-soft',
-            )}
+            className="w-[100px] overflow-hidden rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
           >
             <img
               {...nftImageProps(image, '100px')}
@@ -62,13 +59,19 @@ export function NftGallery({ nft }: NftGalleryProps) {
         ))}
       </div>
 
-      <div className="rounded-2xl bg-card p-5">
+      <div className="relative self-start rounded-xl bg-card p-5">
         <img
           {...nftImageProps(current, '(min-width: 1024px) 404px, 40vw')}
           alt={`Arte do NFT ${nft.name}, imagem ${active + 1} de ${gallery.length}`}
           fetchPriority="high"
-          className="aspect-square w-full rounded-2xl object-cover"
+          className="aspect-square w-full rounded-lg object-cover"
         />
+        <span
+          aria-hidden="true"
+          className="absolute top-[15px] right-[13px] grid size-[30px] place-items-center rounded-full bg-background/60 text-foreground"
+        >
+          <Search className="size-5" />
+        </span>
       </div>
     </section>
   )

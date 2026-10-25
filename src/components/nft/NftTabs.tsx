@@ -8,12 +8,16 @@ interface NftTabsProps {
 }
 
 const triggerClass =
-  'h-auto flex-none px-0 pb-3 text-sm font-bold text-muted-foreground after:bg-primary data-active:text-accent-text'
+  'h-auto flex-none border-0 px-0 pt-0 pb-3 text-sm leading-4 font-bold text-muted-foreground after:bg-primary group-data-horizontal/tabs:after:bottom-0 data-active:text-accent-text'
 
 export function NftTabs({ nft }: NftTabsProps) {
   return (
-    <Tabs defaultValue="details" className="mt-16 gap-0 border-t border-border pt-6 md:mt-24">
-      <TabsList variant="line" aria-label="Informações do NFT" className="h-auto w-full flex-wrap justify-start gap-x-6 gap-y-2 border-b border-border sm:gap-x-10">
+    <Tabs defaultValue="details" className="mt-16 gap-0 md:mt-24">
+      <TabsList
+        variant="line"
+        aria-label="Informações do NFT"
+        className="h-auto w-full flex-wrap justify-start gap-x-8 gap-y-2 border-b border-border p-0"
+      >
         <TabsTrigger value="details" className={triggerClass}>
           Detalhes do NFT
         </TabsTrigger>
@@ -23,9 +27,9 @@ export function NftTabs({ nft }: NftTabsProps) {
         </TabsTrigger>
       </TabsList>
 
-      <TabsContent value="details" className="pt-6">
-        <p className="text-sm leading-6 text-muted-foreground">{nft.details}</p>
-        <dl className="mt-6 flex flex-col gap-4 text-sm leading-6">
+      <TabsContent value="details" className="pt-3">
+        <p className="text-sm leading-5 text-muted-foreground">{nft.details}</p>
+        <dl className="mt-3 flex flex-col gap-3 text-sm leading-6">
           <div>
             <dt className="font-bold">Rede:</dt>
             <dd className="text-muted-foreground">
@@ -43,7 +47,7 @@ export function NftTabs({ nft }: NftTabsProps) {
         </dl>
       </TabsContent>
 
-      <TabsContent value="reviews" className="pt-6">
+      <TabsContent value="reviews" className="pt-3">
         <p className="text-2xl font-bold">{nft.rating.toFixed(1)} de 5</p>
         <NftRating rating={nft.rating} reviewsCount={nft.reviewsCount} className="mt-3" />
         <p className="mt-4 text-sm text-muted-foreground">

@@ -13,12 +13,12 @@ export function NftRating({ rating, reviewsCount, className }: NftRatingProps) {
     reviewsCount === 1 ? '1 avaliação de colecionador' : `${reviewsCount} avaliações de colecionadores`
 
   return (
-    <div className={cn('flex flex-wrap items-center gap-2 text-sm text-muted-foreground', className)}>
-      <span className="flex items-center gap-0.5" aria-hidden="true">
+    <div className={cn('flex flex-wrap items-center gap-1.5 text-base leading-5 text-muted-foreground', className)}>
+      <span className="flex items-center gap-1" aria-hidden="true">
         {Array.from({ length: 5 }, (_, index) => (
           <Star
             key={index}
-            className={cn('size-3.5', index < filled ? 'fill-primary text-primary' : 'text-border-soft')}
+            className={cn('size-[15px]', index < filled ? 'fill-primary text-primary' : 'text-border-soft')}
           />
         ))}
       </span>

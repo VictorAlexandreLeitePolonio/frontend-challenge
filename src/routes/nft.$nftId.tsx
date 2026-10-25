@@ -24,7 +24,6 @@ import { useNft } from '@/hooks/useNfts'
 import { useSession } from '@/hooks/useSession'
 import { compareEth, formatEth } from '@/lib/eth'
 import { realtimeEvents } from '@/realtime/events'
-import { NETWORK_LABELS } from '@/schemas/common'
 import { editionIdSchema, type EditionId, type Nft } from '@/schemas/nft'
 
 export const Route = createFileRoute('/nft/$nftId')({
@@ -38,7 +37,7 @@ function Page() {
 
   if (query.isPending) {
     return (
-      <PageContainer className="pt-4 md:pt-6">
+      <PageContainer className="px-6 pt-0 md:px-6 md:pt-8 xl:px-0">
         <NftDetailSkeleton />
       </PageContainer>
     )
@@ -47,7 +46,7 @@ function Page() {
   if (query.isError) {
     const notFound = query.error instanceof ApiError && query.error.code === 'NOT_FOUND'
     return (
-      <PageContainer className="pt-4 md:pt-6">
+      <PageContainer className="px-6 pt-0 md:px-6 md:pt-8 xl:px-0">
         <div className="hidden md:block">
           <Breadcrumb />
         </div>
@@ -73,7 +72,7 @@ function Page() {
 
 function Breadcrumb() {
   return (
-    <nav aria-label="Trilha de navegação" className="mb-6 text-sm">
+    <nav aria-label="Trilha de navegação" className="mb-3 text-sm leading-4">
       <ol className="flex flex-wrap items-center gap-2">
         <li>
           <Link to="/" className="hover:text-accent-text">
@@ -191,7 +190,7 @@ function NftDetail({ nft }: { nft: Nft }) {
 
   if (!selectedEdition) {
     return (
-      <PageContainer className="pt-4 md:pt-6">
+      <PageContainer className="px-6 pt-0 md:px-6 md:pt-8 xl:px-0">
         <div className="flex flex-col items-center gap-4 py-20 text-center">
           <h1 className="text-2xl font-bold">Edições indisponíveis</h1>
           <p className="text-sm text-muted-foreground">Este NFT não possui edições para compra no momento.</p>
@@ -204,8 +203,8 @@ function NftDetail({ nft }: { nft: Nft }) {
   }
 
   return (
-    <div className="pb-44 md:pb-0">
-      <PageContainer className="pt-4 md:pt-6">
+    <div className="pb-[180px] md:pb-0">
+      <PageContainer className="px-6 pt-0 md:px-6 md:pt-8 xl:px-0">
         <div className="hidden md:block">
           <Breadcrumb />
         </div>
@@ -218,38 +217,66 @@ function NftDetail({ nft }: { nft: Nft }) {
           onToggleFavorite={toggleFavorite}
         />
 
-        <div className="grid gap-8 md:grid-cols-2">
+        <div className="relative z-10 -mx-6 -mt-[114px] rounded-t-[32px] bg-card px-6 pt-8 pb-8 md:hidden">
+          <div className="flex items-start justify-between gap-4">
+            <h1 className="text-xl leading-7 font-bold">{nft.name}</h1>
+            <span
+              role="img"
+              className="inline-flex h-[27px] shrink-0 items-center gap-0.5 rounded-full border border-primary px-2 text-xs font-bold text-accent-text"
+              aria-label={`Avaliação ${nft.rating.toFixed(1)} de 5, ${nft.reviewsCount} avaliações`}
+            >
+              <Star className="size-3 fill-primary text-primary" aria-hidden="true" />
+              {nft.rating.toFixed(1)} <span className="text-muted-foreground">({nft.reviewsCount})</span>
+            </span>
+          </div>
+          <p className="mt-3 text-sm leading-6 text-muted-foreground">{nft.description}</p>
+          <div className="mt-3">
+            <NftEditionSelector editions={nft.editions} value={selectedEdition.id} onChange={selectEdition} />
+          </div>
+          <dl className="mt-3 flex flex-col gap-3 text-sm leading-5 text-subtle">
+            <div className="flex gap-1">
+              <dt>ID do token:</dt>
+              <dd>{nft.tokenId}</dd>
+            </div>
+            <div className="flex gap-1">
+              <dt>Coleção:</dt>
+              <dd>{nft.collectionName}</dd>
+            </div>
+            <div className="flex gap-1">
+              <dt>Atributos:</dt>
+              <dd>{nft.attributes.join(', ')}</dd>
+            </div>
+          </dl>
+        </div>
+
+        <div className="hidden items-start md:grid md:grid-cols-[573fr_595fr] md:gap-8">
           <NftGallery nft={nft} />
 
-          <div className="hidden flex-col gap-6 md:flex">
-            <div>
-              <h1 className="text-2xl font-bold">{nft.name}</h1>
+          <div className="hidden flex-col gap-3 md:flex">
+            <div className="border-b border-border pb-3">
+              <h1 className="text-2xl leading-[37px] font-bold">{nft.name}</h1>
               <div className="mt-3 flex flex-wrap items-center gap-4">
-                <EthPrice value={selectedEdition.price} previous={previousPrice} className="text-base" />
+                <EthPrice value={selectedEdition.price} previous={previousPrice} className="text-lg leading-5" />
                 <NftRating rating={nft.rating} reviewsCount={nft.reviewsCount} className="ml-auto" />
               </div>
             </div>
 
-            <div className="border-t border-border pt-5">
-              <h2 className="text-sm font-bold">Sobre este NFT:</h2>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">{nft.description}</p>
+            <div>
+              <h2 className="text-sm leading-4 font-bold">Sobre este NFT:</h2>
+              <p className="mt-3 text-sm leading-[22px] text-muted-foreground">{nft.description}</p>
             </div>
 
-            <NftEditionSelector
-              editions={nft.editions}
-              value={selectedEdition.id}
-              onChange={selectEdition}
-            />
+            <NftEditionSelector editions={nft.editions} value={selectedEdition.id} onChange={selectEdition} />
 
-            <div className="flex flex-wrap items-end gap-x-6 gap-y-4">
+            <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
               <NftQuantityStepper
                 quantity={quantity}
                 max={selectedEdition.available}
                 onChange={(value) => setQuantityState({ editionId: selectedEdition.id, value })}
                 disabled={buy.isPending || soldOut}
               />
-              <div className="flex flex-wrap gap-3">
-                <Button onClick={buyNow} disabled={soldOut || buy.isPending}>
+              <div className="flex flex-wrap gap-2">
+                <Button onClick={buyNow} disabled={soldOut || buy.isPending} className="md:w-[130px]">
                   {soldOut ? 'ESGOTADO' : buy.isPending ? 'ADICIONANDO…' : 'COMPRAR'}
                 </Button>
                 <Button
@@ -258,7 +285,7 @@ function NftDetail({ nft }: { nft: Nft }) {
                   disabled={favoriteDisabled}
                   aria-pressed={favorite}
                   aria-busy={favoritePending}
-                  className="text-primary"
+                  className="px-2 text-primary md:w-[130px]"
                 >
                   {favoritePending ? (
                     <Loader2 className="animate-spin" aria-hidden="true" />
@@ -280,7 +307,7 @@ function NftDetail({ nft }: { nft: Nft }) {
               {previousPrice ? `Preço atualizado para ${formatEth(selectedEdition.price)}.` : ''}
             </p>
 
-            <dl className="flex flex-col gap-2 border-t border-border pt-5 text-sm leading-6">
+            <dl className="flex flex-col gap-3 text-sm leading-5 text-subtle">
               <div className="flex gap-1">
                 <dt>ID do token:</dt>
                 <dd>{nft.tokenId}</dd>
@@ -295,62 +322,21 @@ function NftDetail({ nft }: { nft: Nft }) {
               </div>
             </dl>
 
-            <div className="flex flex-wrap items-center gap-3 text-sm">
+            <div className="flex flex-wrap items-center gap-2 text-sm leading-5">
               <span className="font-bold">Compartilhar este NFT:</span>
-              <span className="flex items-center gap-2 text-accent-text">
-                <ComingSoon>
+              <span className="flex items-center gap-2 text-foreground">
+                <ComingSoon className="opacity-100">
                   <Share2 className="size-4" aria-hidden="true" />
                 </ComingSoon>
-                <ComingSoon>
+                <ComingSoon className="opacity-100">
                   <Mail className="size-4" aria-hidden="true" />
                 </ComingSoon>
-                <ComingSoon>
+                <ComingSoon className="opacity-100">
                   <Send className="size-4" aria-hidden="true" />
                 </ComingSoon>
               </span>
-              <span className="text-xs text-muted-foreground">Compartilhamento em breve.</span>
             </div>
           </div>
-        </div>
-
-        <div className="relative z-10 -mx-4 -mt-6 rounded-t-[32px] bg-card px-6 pt-6 pb-6 md:hidden">
-          <div className="flex items-start justify-between gap-4">
-            <h1 className="text-lg leading-7 font-bold">{nft.name}</h1>
-            <span
-              role="img"
-              className="inline-flex shrink-0 items-center gap-1 rounded-full border border-primary px-3 py-1 text-xs font-bold text-accent-text"
-              aria-label={`Avaliação ${nft.rating.toFixed(1)} de 5, ${nft.reviewsCount} avaliações`}
-            >
-              <Star className="size-3.5 fill-primary text-primary" aria-hidden="true" />
-              {nft.rating.toFixed(1)} <span className="text-muted-foreground">({nft.reviewsCount})</span>
-            </span>
-          </div>
-          <p className="mt-4 text-sm leading-6 text-muted-foreground">{nft.description}</p>
-          <div className="mt-5">
-            <NftEditionSelector
-              editions={nft.editions}
-              value={selectedEdition.id}
-              onChange={selectEdition}
-            />
-          </div>
-          <dl className="mt-5 flex flex-col gap-2 text-sm leading-6">
-            <div className="flex gap-1">
-              <dt className="text-muted-foreground">ID do token:</dt>
-              <dd>{nft.tokenId}</dd>
-            </div>
-            <div className="flex gap-1">
-              <dt className="text-muted-foreground">Coleção:</dt>
-              <dd>{nft.collectionName}</dd>
-            </div>
-            <div className="flex gap-1">
-              <dt className="text-muted-foreground">Atributos:</dt>
-              <dd>{nft.attributes.join(', ')}</dd>
-            </div>
-            <div className="flex gap-1">
-              <dt className="text-muted-foreground">Rede:</dt>
-              <dd>{NETWORK_LABELS[nft.network]}</dd>
-            </div>
-          </dl>
         </div>
 
         <NftTabs nft={nft} />

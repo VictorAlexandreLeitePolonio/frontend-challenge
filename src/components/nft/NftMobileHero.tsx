@@ -19,18 +19,12 @@ export function NftMobileHero({ nft, favorite, favoritePending, favoriteDisabled
   const current = gallery[Math.min(active, gallery.length - 1)] ?? nft.image
 
   return (
-    <div className="-mx-4 bg-card px-4 pt-4 pb-12 md:hidden">
-      <div className="relative">
-        <img
-          {...nftImageProps(current, '90vw')}
-          alt={`Arte do NFT ${nft.name}, imagem ${active + 1} de ${gallery.length}`}
-          fetchPriority="high"
-          className="aspect-[361/356] w-full rounded-2xl object-cover"
-        />
+    <div className="-mx-6 h-[506px] bg-card md:hidden">
+      <div className="flex items-start justify-between pl-7 pr-[25px] pt-[23px]">
         <Link
           to="/"
           aria-label="Voltar ao catálogo"
-          className="absolute top-3 left-3 grid size-9 place-items-center rounded-full border border-border-soft bg-background/80 text-foreground backdrop-blur"
+          className="grid size-[35px] place-items-center rounded-full border border-border-soft bg-background/40 text-foreground backdrop-blur"
         >
           <ArrowLeft className="size-5" aria-hidden="true" />
         </Link>
@@ -39,9 +33,9 @@ export function NftMobileHero({ nft, favorite, favoritePending, favoriteDisabled
           onClick={onToggleFavorite}
           disabled={favoriteDisabled || favoritePending}
           aria-pressed={favorite}
-          aria-label={favorite ? 'Remover dos favoritos' : 'Favoritar'}
+          aria-label={favorite ? 'Favoritado' : 'Favoritar'}
           aria-busy={favoritePending}
-          className="absolute top-3 right-3 grid size-9 place-items-center rounded-full border border-border-soft bg-background/80 text-primary backdrop-blur disabled:opacity-60"
+          className="grid size-[35px] place-items-center rounded-full border border-border-soft bg-background/40 text-primary backdrop-blur disabled:opacity-60"
         >
           {favoritePending ? (
             <Loader2 className="size-4 animate-spin" aria-hidden="true" />
@@ -51,28 +45,33 @@ export function NftMobileHero({ nft, favorite, favoritePending, favoriteDisabled
         </button>
       </div>
 
-      {gallery.length > 1 && (
-        <div className="mt-2 flex justify-center">
-          {gallery.map((image, index) => (
-            <button
-              key={`${image}-${index}`}
-              type="button"
-              onClick={() => setActive(index)}
-              aria-label={`Ver imagem ${index + 1} de ${gallery.length}`}
-              aria-pressed={index === active}
-              className="grid h-6 min-w-6 place-items-center px-1"
-            >
-              <span
-                aria-hidden="true"
-                className={cn(
-                  'h-2.5 rounded-full border border-primary transition-all',
-                  index === active ? 'w-5 bg-primary' : 'w-2.5 bg-transparent',
-                )}
-              />
-            </button>
-          ))}
-        </div>
-      )}
+      <div className="relative mt-2 mr-[25px] ml-7">
+        <img
+          {...nftImageProps(current, '361px')}
+          alt={`Arte do NFT ${nft.name}, imagem ${active + 1} de ${gallery.length}`}
+          fetchPriority="high"
+          className="h-[356px] w-full rounded-3xl object-cover"
+        />
+        {gallery.length > 1 && (
+          <div className="absolute inset-x-0 bottom-[50px] flex justify-center gap-1.5">
+            {gallery.map((image, index) => (
+              <button
+                key={`${image}-${index}`}
+                type="button"
+                onClick={() => setActive(index)}
+                aria-label={`Ver imagem ${index + 1} de ${gallery.length}`}
+                aria-pressed={index === active}
+                className="grid size-3 place-items-center"
+              >
+                <span
+                  aria-hidden="true"
+                  className={cn('size-[7px] rounded-full transition-colors', index === active ? 'bg-primary' : 'bg-background/70')}
+                />
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   )
 }

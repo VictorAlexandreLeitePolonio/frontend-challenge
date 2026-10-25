@@ -14,8 +14,8 @@ export function NftEditionSelector({ editions, value, onChange }: NftEditionSele
   const labelId = useId()
 
   return (
-    <div className="flex flex-col gap-3">
-      <p id={labelId} className="text-sm">
+    <div className="flex flex-col">
+      <p id={labelId} className="text-sm leading-4 font-bold">
         Edição:
       </p>
       <RadioGroup
@@ -26,7 +26,7 @@ export function NftEditionSelector({ editions, value, onChange }: NftEditionSele
           if (edition && edition.available > 0) onChange(edition.id)
         }}
         orientation="horizontal"
-        className="flex flex-wrap gap-2"
+        className="mt-3 flex flex-wrap gap-3 md:gap-1.5"
       >
         {editions.map((edition) => {
           const soldOut = edition.available === 0
@@ -43,14 +43,14 @@ export function NftEditionSelector({ editions, value, onChange }: NftEditionSele
               <Label
                 htmlFor={itemId}
                 className={cn(
-                  'inline-flex cursor-pointer items-center gap-2 rounded-full border border-border px-3 py-1 text-sm font-normal transition-colors',
+                  'inline-flex h-7 cursor-pointer items-center rounded-full border border-border px-1.5 text-sm leading-none font-normal text-muted-foreground transition-colors',
                   'peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-background',
                   active && 'border-primary font-bold text-accent-text',
-                  soldOut && 'cursor-not-allowed text-muted-foreground opacity-60',
+                  soldOut && 'cursor-not-allowed opacity-60',
                 )}
               >
                 {EDITION_LABELS[edition.id]}
-                {soldOut && <span className="text-xs">Esgotada</span>}
+                {soldOut && <span className="sr-only">, esgotada</span>}
               </Label>
             </div>
           )
