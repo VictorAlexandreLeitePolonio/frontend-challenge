@@ -1,8 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { useMatch, useNavigate } from '@tanstack/react-router'
 import { Input } from '@/components/ui/input'
-
-const DEBOUNCE_MS = 300
+import { useDebouncedSearch } from '@/hooks/useDebouncedSearch'
 
 interface HeaderSearchProps {
   onClose: () => void
@@ -13,50 +12,34 @@ export function HeaderSearch({ onClose }: HeaderSearchProps) {
   const navigate = useNavigate()
   const homeMatch = useMatch({ from: '/', shouldThrow: false })
   const isHome = homeMatch !== undefined
-  const urlQ = homeMatch?.search.q ?? ''
-  const [value, setValue] = useState(urlQ)
-  const applied = useRef(urlQ)
   const inputRef = useRef<HTMLInputElement>(null)
-
-  useEffect(() => {
-    inputRef.current?.focus()
-  }, [])
-
-  useEffect(() => {
-    if (urlQ === applied.current) return
-    applied.current = urlQ
-    setValue(urlQ)
-  }, [urlQ])
 
   const apply = useCallback(
     (q: string) => {
-      if (q === applied.current) return
-      applied.current = q
       if (isHome) {
-        navigate({
+        void navigate({
           to: '/',
           search: (prev) => ({ ...prev, q: q || undefined, page: undefined }),
           replace: true,
           resetScroll: false,
         })
       } else {
-        navigate({ to: '/', search: q ? { q } : {}, resetScroll: false })
+        void navigate({ to: '/', search: q ? { q } : {}, resetScroll: false })
       }
     },
     [isHome, navigate],
   )
+  const { value, setValue, commit } = useDebouncedSearch(homeMatch?.search.q ?? '', apply)
 
   useEffect(() => {
-    const timer = window.setTimeout(() => apply(value.trim()), DEBOUNCE_MS)
-    return () => window.clearTimeout(timer)
-  }, [value, apply])
-
+    inputRef.current?.focus()
+  }, [])
   return (
     <form
       className="mx-10 flex max-w-md flex-1 items-center"
       onSubmit={(event) => {
         event.preventDefault()
-        apply(value.trim())
+        commit()
       }}
     >
       <label htmlFor="catalog-search-desktop" className="sr-only">

@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { Loader2, Unplug } from 'lucide-react'
-import { ApiError } from '@/api/client'
 import { errorMessage } from '@/components/common/ErrorState'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
@@ -48,7 +47,7 @@ export function WalletPicker({ wallets, selectedId, onSelect, onDisconnect, disa
     setActionError(null)
     connect.mutate(wallet.id, {
       onError: (error) => {
-        setActionError(error instanceof ApiError && error.code === 'WALLET_REJECTED' ? 'Conexão recusada pela carteira' : errorMessage(error))
+        setActionError(errorMessage(error))
       },
     })
   }

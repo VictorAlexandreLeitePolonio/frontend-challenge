@@ -27,7 +27,7 @@ export class DomainError extends Error {
 
 // ---------- NFTs ----------
 
-export function toNftSummary(nft: DbNft): NftSummary {
+function toNftSummary(nft: DbNft): NftSummary {
   const inStock = nft.editions.filter((edition) => edition.available > 0)
   const priced = inStock.length > 0 ? inStock : nft.editions
   // Preço de vitrine = edição 1/50 (padrão do detalhe, como no Figma); senão a menor disponível.
@@ -156,7 +156,7 @@ function couponOf(cart: DbCart) {
   }
 }
 
-export function summarize(lines: { lineTotal: string }[], couponPercent: number | null, network: Network): Summary {
+function summarize(lines: { lineTotal: string }[], couponPercent: number | null, network: Network): Summary {
   const subtotal = addEth('0', ...lines.map((line) => line.lineTotal))
   const discount = couponPercent ? percentOf(subtotal, couponPercent) : '0.00'
   const networkFee = lines.length > 0 ? NETWORK_FEES[network] : '0.00'
@@ -309,7 +309,7 @@ export function orderUpdatedEvent(order: Order): OrderUpdatedEvent {
   }
 }
 
-export interface ResolveResult {
+interface ResolveResult {
   order: Order
   changedNfts: DbNft[]
 }

@@ -6,7 +6,7 @@ import { API, apiError, getToken, hashPassword, parseBody, requireUser, route } 
 import { uid } from '../random'
 import { getScenario } from '../scenarios'
 
-export function toPublicUser(user: DbUser): User {
+function toPublicUser(user: DbUser): User {
   return { id: user.id, username: user.username, displayName: user.displayName, email: user.email, avatar: user.avatar }
 }
 

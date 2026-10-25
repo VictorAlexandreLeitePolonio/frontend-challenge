@@ -1,83 +1,42 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback } from 'react'
 import { Search, SlidersHorizontal } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { cn } from '@/lib/utils'
+import { useDebouncedSearch } from '@/hooks/useDebouncedSearch'
 import { useCatalogSearch } from './useCatalogSearch'
 
 interface CatalogSearchBarProps {
-  /** ids distintos para as instâncias mobile e desktop */
-  inputId?: string
   activeFilters: number
   onOpenFilters: () => void
-  /** Campo menor, integrado à barra de ferramentas do catálogo desktop. */
-  compact?: boolean
-  className?: string
 }
 
-export function CatalogSearchBar({
-  inputId = 'catalog-search',
-  activeFilters,
-  onOpenFilters,
-  compact = false,
-  className,
-}: CatalogSearchBarProps) {
+/** Busca + botão de filtros do topo da home no mobile (no desktop a busca fica na lupa do header). */
+export function CatalogSearchBar({ activeFilters, onOpenFilters }: CatalogSearchBarProps) {
   const { search, update } = useCatalogSearch()
-  const [value, setValue] = useState(search.q ?? '')
-  const lastUrlValue = useRef(search.q ?? '')
-
-  useEffect(() => {
-    const urlValue = search.q ?? ''
-    if (urlValue === lastUrlValue.current) return
-    lastUrlValue.current = urlValue
-    setValue(urlValue)
-  }, [search.q])
-
-  useEffect(() => {
-    const urlValue = search.q ?? ''
-    if (value === urlValue) return
-    const timer = window.setTimeout(() => {
-      lastUrlValue.current = value
-      update({ q: value.trim() || undefined }, { replace: true })
-    }, 300)
-    return () => window.clearTimeout(timer)
-  }, [value, search.q, update])
-
-  const applyNow = () => {
-    lastUrlValue.current = value
-    update({ q: value.trim() || undefined }, { replace: true })
-  }
+  const apply = useCallback((q: string) => update({ q: q || undefined }, { replace: true }), [update])
+  const { value, setValue, commit } = useDebouncedSearch(search.q ?? '', apply)
 
   return (
     <form
       role="search"
       aria-label="Buscar no catálogo"
-      className={cn('flex items-center gap-2', className)}
+      className="flex items-center gap-2"
       onSubmit={(event) => {
         event.preventDefault()
-        applyNow()
+        commit()
       }}
     >
       <div className="relative min-w-0 flex-1">
-        <Search
-          className={cn(
-            'pointer-events-none absolute top-1/2 -translate-y-1/2 text-muted-foreground',
-            compact ? 'left-3 size-4' : 'left-3 size-[22px]',
-          )}
-          aria-hidden="true"
-        />
-        <label htmlFor={inputId} className="sr-only">
+        <Search className="pointer-events-none absolute top-1/2 left-3 size-[22px] -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+        <label htmlFor="catalog-search" className="sr-only">
           Explorar coleções
         </label>
         <Input
-          id={inputId}
+          id="catalog-search"
           value={value}
           onChange={(event) => setValue(event.target.value)}
           placeholder="Explorar coleções"
-          className={cn(
-            'rounded-full border-0 bg-card placeholder:text-subtle',
-            compact ? 'h-8 pr-3 pl-8 text-xs' : 'h-[45px] pr-4 pl-10 text-sm',
-          )}
+          className="h-[45px] rounded-full border-0 bg-card pr-4 pl-10 text-sm placeholder:text-subtle"
           autoComplete="off"
           maxLength={80}
         />

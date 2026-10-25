@@ -10,7 +10,7 @@ import { connectedUsers, deliverRaw, dropConnections, redeliverLastEvent } from 
  * Controles do "servidor" simulado para DevPanel e Playwright. Tudo passa pelo db e
  * pelo transporte Socket.IO mockado — nada mexe direto na UI ou no cache do cliente.
  */
-export const mockControls = {
+const mockControls = {
   scenarios: SCENARIOS,
   getScenario,
   setScenario(id: ScenarioId) {
@@ -59,7 +59,7 @@ export const mockControls = {
   },
 }
 
-export type MockControls = typeof mockControls
+type MockControls = typeof mockControls
 
 declare global {
   interface Window {

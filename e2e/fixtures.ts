@@ -38,10 +38,6 @@ export const test = base.extend<{ scenario: ScenarioId }>({
 
 export { expect }
 
-export async function waitForMocks(page: Page) {
-  await page.waitForFunction(() => Boolean(window.__kurioMock))
-}
-
 /** Login pela UI real. */
 export async function login(page: Page, user = ALICE, redirect?: string) {
   await page.goto(redirect ? `/login?redirect=${encodeURIComponent(redirect)}` : '/login')

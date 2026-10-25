@@ -4,7 +4,7 @@ import type { RealtimeEvent } from '@/schemas/events'
 import { bus } from './bus'
 import { findSession } from './http'
 
-export const SOCKET_URL = import.meta.env.VITE_SOCKET_URL ?? 'wss://realtime.kurio.mock'
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL ?? 'wss://realtime.kurio.mock'
 
 const realtime = ws.link(`${SOCKET_URL}/*`)
 

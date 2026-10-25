@@ -21,7 +21,7 @@ import type { CheckoutFormValues } from './checkout-form-schema'
  * - uncertain: falha transitória ou tentativa sem desfecho (permite repetir com segurança).
  * - done: pedido criado, redirecionando para o recibo.
  */
-export type CheckoutStep = 'editing' | 'reviewing' | 'submitting' | 'uncertain' | 'done'
+type CheckoutStep = 'editing' | 'reviewing' | 'submitting' | 'uncertain' | 'done'
 
 interface UseCheckoutFlowOptions {
   cart: Cart

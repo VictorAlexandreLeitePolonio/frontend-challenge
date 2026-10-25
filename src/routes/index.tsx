@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { useIsDesktop } from '@/components/auth/useIsDesktop'
+import { useIsDesktop } from '@/hooks/useIsDesktop'
 import { EmptyState } from '@/components/common/EmptyState'
 import { ErrorState } from '@/components/common/ErrorState'
 import { NftCard } from '@/components/common/NftCard'

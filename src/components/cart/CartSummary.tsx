@@ -56,15 +56,15 @@ export function CartSummary({ cart }: CartSummaryProps) {
   }
 
   const checkoutButton = blocked ? (
-    <Button disabled aria-describedby={blockedId} className="h-[60px] w-full rounded-full text-base md:h-10 md:rounded-sm md:text-sm">
+    <Button disabled aria-describedby={blockedId} variant="cta" size="cta">
       Conectar e finalizar
     </Button>
   ) : isAuthenticated ? (
-    <Button asChild className="h-[60px] w-full rounded-full text-base max-md:bg-gradient-to-b max-md:from-accent-text max-md:to-primary md:h-10 md:rounded-sm md:text-sm">
+    <Button asChild variant="cta" size="cta">
       <Link to="/checkout">Conectar e finalizar</Link>
     </Button>
   ) : (
-    <Button asChild className="h-[60px] w-full rounded-full text-base max-md:bg-gradient-to-b max-md:from-accent-text max-md:to-primary md:h-10 md:rounded-sm md:text-sm">
+    <Button asChild variant="cta" size="cta">
       <Link to="/login" search={{ redirect: '/checkout' }}>
         Conectar e finalizar
       </Link>

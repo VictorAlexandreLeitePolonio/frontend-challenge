@@ -4,7 +4,7 @@ import { cartService } from '@/services/cart'
 import { queryKeys } from './query-keys'
 import { useSession } from './useSession'
 
-export function useCartKey() {
+function useCartKey() {
   const { user } = useSession()
   return queryKeys.cart(user ? `user:${user.id}` : 'guest')
 }

@@ -1,7 +1,6 @@
 import { AlertTriangle } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { ApiError } from '@/api/client'
 import { errorMessage } from '@/components/common/ErrorState'
 import { Button } from '@/components/ui/button'
 import { useConnectWallet, useDisconnectWallet } from '@/hooks/useAccount'
@@ -23,7 +22,7 @@ export function WalletConnection({ wallet }: WalletConnectionProps) {
     connect.mutate(wallet.id, {
       onSuccess: () => toast.success('Carteira conectada'),
       onError: (error) => {
-        setActionError(error instanceof ApiError && error.code === 'WALLET_REJECTED' ? 'Conexão recusada pela carteira' : errorMessage(error))
+        setActionError(errorMessage(error))
       },
     })
   }

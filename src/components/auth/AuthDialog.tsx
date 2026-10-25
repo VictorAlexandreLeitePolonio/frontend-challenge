@@ -9,7 +9,7 @@ import { LoginForm } from './LoginForm'
 import { SignupForm } from './SignupForm'
 import { safeRedirect } from './safe-redirect'
 import { SocialAuth } from './SocialAuth'
-import { useIsDesktop } from './useIsDesktop'
+import { useIsDesktop } from '@/hooks/useIsDesktop'
 
 /** Tira `auth` e `redirect` do href atual: o search tipado da rota da página não conhece esses parâmetros. */
 function withoutAuth(href: string): string {
@@ -82,7 +82,7 @@ export function AuthDialog({ mode, redirect }: AuthDialogProps) {
           )}
           // Foco inicial no primeiro campo (não no X), como num formulário de login
           onOpenAutoFocus={(event) => {
-            const input = (event.currentTarget as HTMLElement).querySelector('input')
+            const input = event.currentTarget instanceof HTMLElement ? event.currentTarget.querySelector('input') : null
             if (!input) return
             event.preventDefault()
             input.focus()

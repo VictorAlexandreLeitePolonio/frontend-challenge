@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router'
 import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useIsDesktop } from '@/components/auth/useIsDesktop'
+import { useIsDesktop } from '@/hooks/useIsDesktop'
 import { CheckoutForm } from './CheckoutForm'
 import { CheckoutSidebar } from './CheckoutSidebar'
 import { PlaceErrorPanel, ReviewErrorPanel } from './CheckoutErrorPanels'
@@ -117,7 +117,7 @@ export function CheckoutContent({ cart, wallets, profile, user }: CheckoutConten
                   onClick={flow.confirm}
                   disabled={!flow.canProceed || flow.isSubmitting}
                   aria-describedby={flow.reason ? REASON_ID : undefined}
-                  className="h-[60px] w-full rounded-full text-base max-md:bg-gradient-to-b max-md:from-accent-text max-md:to-primary md:h-10 md:rounded-sm md:text-sm"
+                  variant="cta" size="cta"
                 >
                   {flow.isSubmitting ? (
                     <>
@@ -144,7 +144,7 @@ export function CheckoutContent({ cart, wallets, profile, user }: CheckoutConten
                 form={FORM_ID}
                 disabled={!flow.canProceed || flow.isReviewing || flow.isSubmitting}
                 aria-describedby={flow.reason ? REASON_ID : undefined}
-                className="h-[60px] w-full rounded-full text-base max-md:bg-gradient-to-b max-md:from-accent-text max-md:to-primary md:h-10 md:rounded-sm md:text-sm"
+                variant="cta" size="cta"
               >
                 {flow.isReviewing ? (
                   <>

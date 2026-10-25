@@ -13,7 +13,7 @@ Legenda: ✅ atendido e testado · ◐ atendido com ressalva (explicada na linha
 | TanStack Query | Queries, mutations, otimismo, invalidação por eventos | `src/hooks/` |
 | Axios | Único cliente REST, normaliza erros em `ApiError` | `src/api/client.ts` |
 | Socket.IO | `socket.io-client` real, interceptado pelo MSW | `src/realtime/`, `src/mocks/socket.ts` |
-| Tailwind + shadcn/ui | Tema com tokens do Figma, 16 componentes Radix adaptados | `src/styles.css`, `src/components/ui/` |
+| Tailwind + shadcn/ui | Tema com tokens do Figma, 12 componentes Radix adaptados (só os usados) | `src/styles.css`, `src/components/ui/` |
 | MSW | REST + WebSocket, cenários, persistência e reset | `src/mocks/` |
 | Playwright | 38 testes × 3 viewports, regressão visual | `e2e/` |
 | Lighthouse | 3 execuções por página/perfil, relatórios versionados | `lighthouserc.*.json`, [LIGHTHOUSE.md](LIGHTHOUSE.md) |

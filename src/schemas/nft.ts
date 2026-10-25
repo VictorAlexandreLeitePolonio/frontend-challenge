@@ -103,7 +103,7 @@ export const nftListParamsSchema = z.object({
 })
 export type NftListParams = z.infer<typeof nftListParamsSchema>
 
-export const facetSchema = z.object({ id: z.string(), label: z.string(), count: z.number().int() })
+const facetSchema = z.object({ id: z.string(), label: z.string(), count: z.number().int() })
 
 export const nftListResponseSchema = z.object({
   items: z.array(nftSummarySchema),

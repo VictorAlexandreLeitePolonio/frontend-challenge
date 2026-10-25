@@ -95,7 +95,7 @@ export function Footer() {
   )
 }
 
-export function WalletsBadge() {
+function WalletsBadge() {
   return (
     <span className="inline-flex w-fit items-center gap-2 rounded-sm border border-border-soft bg-surface-dark px-2 py-1 text-[9px] font-bold tracking-wide text-primary">
       METAMASK · WALLETCONNECT · COINBASE

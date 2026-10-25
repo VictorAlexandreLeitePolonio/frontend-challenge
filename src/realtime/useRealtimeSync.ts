@@ -117,4 +117,3 @@ export function useRealtimeSync() {
   }, [queryClient, userId, isLoading])
 }
 
-export { realtimeEvents }

@@ -1,7 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { Loader2, MoreVertical, WalletMinimal } from 'lucide-react'
 import { useState } from 'react'
-import { ApiError } from '@/api/client'
 import { errorMessage } from '@/components/common/ErrorState'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
@@ -40,8 +39,7 @@ export function MobileCheckout({ cart, wallets, flow }: MobileCheckoutProps) {
   const connectWallet = (wallet: Wallet) => {
     setWalletError(null)
     connect.mutate(wallet.id, {
-      onError: (error) =>
-        setWalletError(error instanceof ApiError && error.code === 'WALLET_REJECTED' ? 'Conexão recusada pela carteira' : errorMessage(error)),
+      onError: (error) => setWalletError(errorMessage(error)),
     })
   }
   const disconnectWallet = (wallet: Wallet) => {
@@ -185,7 +183,7 @@ export function MobileCheckout({ cart, wallets, flow }: MobileCheckoutProps) {
             type="button"
             onClick={() => selected && connectWallet(selected)}
             disabled={!selected || connect.isPending}
-            className="h-[60px] w-full rounded-full bg-gradient-to-br from-accent-text to-primary text-base"
+            variant="cta" size="cta"
           >
             {connect.isPending ? <Loader2 className="animate-spin motion-reduce:animate-none" aria-hidden="true" /> : 'Conectar carteira'}
           </Button>
@@ -194,7 +192,7 @@ export function MobileCheckout({ cart, wallets, flow }: MobileCheckoutProps) {
             type="button"
             onClick={flow.quote ? flow.confirm : () => flow.review(flow.initialValues)}
             disabled={!flow.canProceed || flow.isReviewing || flow.isSubmitting}
-            className="h-[60px] w-full rounded-full bg-gradient-to-br from-accent-text to-primary text-base"
+            variant="cta" size="cta"
           >
             {flow.isReviewing || flow.isSubmitting ? <Loader2 className="animate-spin motion-reduce:animate-none" aria-hidden="true" /> : null}
             {flow.quote ? 'Confirmar compra' : flow.isReviewing ? 'Revisando…' : 'Revisar pedido'}
