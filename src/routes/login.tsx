@@ -1,17 +1,33 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { PageContainer } from '@/components/layout/PageContainer'
+import { createFileRoute, Link } from '@tanstack/react-router'
+import { AuthFrame } from '@/components/auth/AuthFrame'
+import { LoginForm } from '@/components/auth/LoginForm'
 import { redirectSearchSchema } from '@/lib/redirect'
+
 export const Route = createFileRoute('/login')({
   validateSearch: redirectSearchSchema,
   component: Page,
 })
 
-// Placeholder da fundação: tela implementada pelos agentes (docs/superpowers/plans/2026-10-25-agents.md).
 function Page() {
+  const { redirect } = Route.useSearch()
+
   return (
-    <PageContainer className="py-12">
-      <h1 className="text-2xl font-bold">Entrar</h1>
-      <p className="text-muted-foreground">Em construção.</p>
-    </PageContainer>
+    <AuthFrame
+      mode="login"
+      redirect={redirect}
+      dialogTitle="Entrar na Kurio"
+      mobileTitle="Entrar"
+      subtitle="Entre para gerenciar sua carteira, coleção e perfil de criador."
+      footer={
+        <p>
+          Novo na Kurio?{' '}
+          <Link to="/signup" search={{ redirect }} className="text-accent-text hover:underline">
+            Crie uma conta
+          </Link>
+        </p>
+      }
+    >
+      <LoginForm redirect={redirect} />
+    </AuthFrame>
   )
 }
