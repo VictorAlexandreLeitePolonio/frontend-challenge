@@ -15,7 +15,7 @@ import { NETWORK_LABELS, networkSchema } from '@/schemas/common'
 import { WALLET_PROVIDER_LABELS, walletInputSchema, walletProviderSchema, type Wallet, type WalletInput, type WalletSlot } from '@/schemas/wallet'
 
 const fieldClass = 'h-12 rounded-xl border-border bg-background/40 md:h-10 md:rounded-sm'
-const selectClass = `${fieldClass} data-[size=default]:h-12 md:data-[size=default]:h-10`
+const selectClass = `${fieldClass} w-full data-[size=default]:h-12 md:data-[size=default]:h-10`
 const FIELD_NAMES = ['displayName', 'nickname', 'network', 'profileName', 'address', 'secondaryAddress', 'provider', 'referralCode', 'email', 'ensName'] as const
 
 type WalletFormValues = Omit<WalletInput, 'slot'>

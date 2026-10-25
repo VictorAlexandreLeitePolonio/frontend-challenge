@@ -65,7 +65,7 @@ export function AuthDialog({ mode, redirect }: AuthDialogProps) {
   return (
     <DialogPrimitive.Root open onOpenChange={(open) => !open && close()}>
       <DialogPrimitive.Portal>
-        <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/60" />
+        <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/25" />
         <DialogPrimitive.Content
           className={cn(
             'fixed z-50 flex flex-col overflow-y-auto bg-card text-foreground outline-none',
