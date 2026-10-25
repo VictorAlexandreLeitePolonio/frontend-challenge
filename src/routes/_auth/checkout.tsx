@@ -391,8 +391,13 @@ function CheckoutContent({ cart, wallets, profile, user }: CheckoutContentProps)
           <div className="flex flex-col gap-6">
             {staleDiff && <QuoteDiff previous={staleDiff.previous} next={staleDiff.next} />}
             <QuoteReview quote={quote} />
-            {placeError && !placeOrder.isPending && (
-              <PlaceErrorPanel error={placeError} uncertain={uncertain} onRetry={handleRetry} isRetrying={placeOrder.isPending} />
+            {(placeError || unconfirmedAttempt) && !placeOrder.isPending && (
+              <PlaceErrorPanel
+                error={placeError}
+                uncertain={!placeError || uncertain}
+                onRetry={handleRetry}
+                isRetrying={placeOrder.isPending}
+              />
             )}
           </div>
         )}
