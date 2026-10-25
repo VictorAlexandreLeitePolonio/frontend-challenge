@@ -1,3 +1,4 @@
+import { useCallback } from 'react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import type { NftListParams } from '@/schemas/nft'
 
@@ -6,23 +7,31 @@ export function useCatalogSearch() {
   const search = useSearch({ from: '/' })
   const navigate = useNavigate({ from: '/' })
 
-  const update = (patch: Partial<NftListParams>, options: { replace?: boolean; keepPage?: boolean } = {}) =>
-    navigate({
-      search: (prev) => {
-        const next = { ...prev, ...patch }
-        if (!options.keepPage) delete next.page
-        // Remove chaves vazias para manter a URL limpa e a query key estável.
-        for (const key of Object.keys(next) as (keyof NftListParams)[]) {
-          const value = next[key]
-          if (value === undefined || value === '' || (Array.isArray(value) && value.length === 0)) delete next[key]
-        }
-        return next
-      },
-      replace: options.replace,
-      resetScroll: false,
-    })
+  const update = useCallback(
+    (patch: Partial<NftListParams>, options: { replace?: boolean; keepPage?: boolean } = {}) =>
+      navigate({
+        search: (prev) => {
+          const next = { ...prev, ...patch }
+          if (!options.keepPage) delete next.page
+          // Remove chaves vazias para manter a URL limpa e a query key estável.
+          for (const key of Object.keys(next) as (keyof NftListParams)[]) {
+            const value = next[key]
+            if (value === undefined || value === '' || (Array.isArray(value) && value.length === 0)) delete next[key]
+          }
+          return next
+        },
+        replace: options.replace,
+        resetScroll: false,
+      }),
+    [navigate],
+  )
 
-  return { search, update }
+  const reset = useCallback(
+    () => navigate({ search: {}, replace: false, resetScroll: false }),
+    [navigate],
+  )
+
+  return { search, update, reset }
 }
 
 export function toggleValue<T>(list: T[] | undefined, value: T): T[] {

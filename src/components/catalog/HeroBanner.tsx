@@ -1,10 +1,7 @@
 import { ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { nftImageProps } from '@/lib/images'
-
-function scrollToCatalog() {
-  document.getElementById('catalogo')?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })
-}
+import { scrollToCatalog } from './scrollToCatalog'
 
 export function HeroBanner() {
   return (

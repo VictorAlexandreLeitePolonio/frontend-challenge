@@ -1,17 +1,184 @@
+import { useEffect, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
+import { EmptyState } from '@/components/common/EmptyState'
+import { ErrorState } from '@/components/common/ErrorState'
+import { NftCard } from '@/components/common/NftCard'
+import { NftCardSkeleton } from '@/components/common/NftCardSkeleton'
+import { CatalogBlog } from '@/components/catalog/CatalogBlog'
+import { CatalogFilters, CatalogFiltersSkeleton } from '@/components/catalog/CatalogFilters'
+import { CatalogPagination } from '@/components/catalog/CatalogPagination'
+import { CatalogPromos } from '@/components/catalog/CatalogPromos'
+import { CatalogSearchBar } from '@/components/catalog/CatalogSearchBar'
+import { CatalogSort } from '@/components/catalog/CatalogSort'
+import { CatalogTabs } from '@/components/catalog/CatalogTabs'
+import { FeaturedNftCard } from '@/components/catalog/FeaturedNftCard'
+import { HeroBanner } from '@/components/catalog/HeroBanner'
+import { useCatalogSearch } from '@/components/catalog/useCatalogSearch'
 import { PageContainer } from '@/components/layout/PageContainer'
-import { nftListParamsSchema } from '@/schemas/nft'
+import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet'
+import { useNfts } from '@/hooks/useNfts'
+import { nftListParamsSchema, type NftTab } from '@/schemas/nft'
+
 export const Route = createFileRoute('/')({
   validateSearch: nftListParamsSchema,
   component: Page,
 })
 
-// Placeholder da fundação: tela implementada pelos agentes (docs/superpowers/plans/2026-10-25-agents.md).
 function Page() {
+  const { search, update, reset } = useCatalogSearch()
+  const [filtersOpen, setFiltersOpen] = useState(false)
+  const query = useNfts({ ...search, pageSize: search.pageSize ?? 9 })
+  const data = query.data
+  const tab = search.tab ?? 'all'
+  const activeFilters =
+    (search.collections?.length ?? 0) + (search.networks?.length ?? 0) + (search.minPrice || search.maxPrice ? 1 : 0)
+  const featured = data?.items.find((item) => item.compareAtPrice !== null) ?? data?.items[0]
+
+  useEffect(() => {
+    if (!data || data.totalPages === 0) return
+    if (data.page <= data.totalPages) return
+    update({ page: 1 }, { keepPage: true, replace: true })
+  }, [data, update])
+
+  const changeTab = (next: NftTab) => update({ tab: next === 'all' ? undefined : next })
+
   return (
-    <PageContainer className="py-12">
-      <h1 className="text-2xl font-bold">Início</h1>
-      <p className="text-muted-foreground">Em construção.</p>
+    <PageContainer className="pt-4 md:pt-0">
+      <div className="mb-4 md:hidden">
+        <CatalogSearchBar activeFilters={activeFilters} onOpenFilters={() => setFiltersOpen(true)} />
+      </div>
+
+      <HeroBanner />
+
+      <div id="busca" className="scroll-mt-6" />
+      <section id="catalogo" aria-labelledby="catalog-title" className="mt-4 scroll-mt-6 md:mt-24">
+        <h2 id="catalog-title" className="sr-only">
+          Catálogo de NFTs
+        </h2>
+        <div className="grid gap-10 md:grid-cols-[260px_minmax(0,1fr)] md:gap-8 lg:grid-cols-[310px_minmax(0,1fr)] lg:gap-12">
+          <aside className="hidden flex-col gap-8 md:flex" aria-label="Filtros do catálogo">
+            {query.isPending && !data && (
+              <>
+                <CatalogFiltersSkeleton />
+                <SkeletonFeatured />
+              </>
+            )}
+            {data && (
+              <>
+                <CatalogFilters facets={data.facets} />
+                {featured && <FeaturedNftCard nft={featured} />}
+              </>
+            )}
+          </aside>
+
+          <div className="min-w-0">
+            <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
+              <CatalogTabs value={tab} onChange={changeTab} />
+              <CatalogSort
+                value={search.sort ?? 'recent'}
+                onChange={(sort) => update({ sort: sort === 'recent' ? undefined : sort })}
+                className="hidden md:flex"
+              />
+            </div>
+
+            <div className="mt-3 min-h-5 text-xs text-muted-foreground" aria-live="polite">
+              {query.isFetching && !query.isPending ? 'Atualizando resultados…' : ''}
+            </div>
+
+            {query.isPending && !data && (
+              <div className="grid grid-cols-2 gap-x-4 gap-y-6 md:gap-x-8 md:gap-y-12 lg:grid-cols-3">
+                {Array.from({ length: 9 }, (_, index) => (
+                  <NftCardSkeleton key={index} />
+                ))}
+              </div>
+            )}
+
+            {query.isError && !data && (
+              <ErrorState error={query.error} onRetry={() => query.refetch()} isRetrying={query.isFetching} />
+            )}
+
+            {query.isError && data && (
+              <div className="mb-6">
+                <ErrorState
+                  error={query.error}
+                  title="Não foi possível atualizar o catálogo"
+                  onRetry={() => query.refetch()}
+                  isRetrying={query.isFetching}
+                />
+              </div>
+            )}
+
+            {data && data.items.length === 0 && (
+              <EmptyState
+                title="Nenhum NFT encontrado"
+                description="Ajuste a busca ou os filtros para descobrir outras obras."
+                action={
+                  <Button
+                    onClick={() => {
+                      reset()
+                      setFiltersOpen(false)
+                    }}
+                  >
+                    Limpar filtros
+                  </Button>
+                }
+              />
+            )}
+
+            {data && data.items.length > 0 && (
+              <>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-6 md:gap-x-8 md:gap-y-12 lg:grid-cols-3">
+                  {data.items.map((nft, index) => (
+                    <NftCard key={nft.id} nft={nft} priority={index < 3} />
+                  ))}
+                </div>
+                <CatalogPagination
+                  page={data.page}
+                  totalPages={data.totalPages}
+                  onChange={(page) => update({ page }, { keepPage: true })}
+                />
+              </>
+            )}
+          </div>
+        </div>
+      </section>
+
+      <CatalogPromos />
+      <CatalogBlog />
+
+      <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
+        <SheetContent side="right" className="overflow-y-auto bg-card">
+          <SheetHeader className="p-6 pb-2">
+            <SheetTitle className="text-lg font-bold">Filtros</SheetTitle>
+            <SheetDescription>Refine o catálogo por coleção, preço e rede.</SheetDescription>
+          </SheetHeader>
+          <div className="px-6 pb-4">
+            {data ? <CatalogFilters facets={data.facets} showSort /> : <CatalogFiltersSkeleton />}
+          </div>
+          <SheetFooter className="sticky bottom-0 border-t border-border bg-card p-6">
+            <Button onClick={() => setFiltersOpen(false)}>Ver resultados</Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
     </PageContainer>
+  )
+}
+
+function SkeletonFeatured() {
+  return (
+    <div className="bg-card p-5" aria-hidden="true">
+      <Skeleton className="h-5 w-36" />
+      <Skeleton className="mt-3 h-4 w-32" />
+      <Skeleton className="mt-5 aspect-[310/368] w-full rounded-sm" />
+    </div>
   )
 }
