@@ -39,7 +39,7 @@ export function NftMobileHero({ nft, favorite, favoritePending, favoriteDisabled
           onClick={onToggleFavorite}
           disabled={favoriteDisabled || favoritePending}
           aria-pressed={favorite}
-          aria-label={favorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+          aria-label={favorite ? 'Remover dos favoritos' : 'Favoritar'}
           aria-busy={favoritePending}
           className="absolute top-3 right-3 grid size-9 place-items-center rounded-full border border-border-soft bg-background/80 text-primary backdrop-blur disabled:opacity-60"
         >
