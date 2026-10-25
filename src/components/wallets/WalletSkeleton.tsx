@@ -2,7 +2,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 function CardSkeleton() {
   return (
-    <div className="flex flex-col gap-6 border-b border-border pb-10" aria-hidden="true">
+    <div className="flex flex-col gap-6" aria-hidden="true">
       <div className="flex flex-col gap-2">
         <Skeleton className="h-4 w-48" />
         <Skeleton className="h-3.5 w-full max-w-[520px]" />
@@ -15,16 +15,16 @@ function CardSkeleton() {
           </div>
         ))}
       </div>
-      <Skeleton className="h-10 w-32 rounded-sm" />
+      <Skeleton className="h-10 w-[131px] rounded-sm" />
     </div>
   )
 }
 
 export function WalletSkeleton() {
   return (
-    <div className="flex flex-col gap-10">
+    <div className="flex flex-col gap-8">
       <CardSkeleton />
-      <CardSkeleton />
+      <Skeleton className="h-4 w-48" />
     </div>
   )
 }

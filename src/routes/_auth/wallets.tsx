@@ -47,14 +47,12 @@ function Page() {
             />
           )}
           {wallets.data && (
-            <div className="flex flex-col gap-10">
+            <>
               <WalletCard
                 slot="primary"
                 title="Carteira principal"
                 description="Estas carteiras ficam disponíveis no pagamento e para receber NFTs comprados."
-                emptyMessage="Você ainda não adicionou uma carteira principal."
                 wallet={primary}
-                openFormWhenEmpty
                 onSaved={() => setJustSaved(true)}
               />
               <WalletCard
@@ -62,9 +60,10 @@ function Page() {
                 title="Carteira secundária"
                 emptyMessage="Você ainda não adicionou uma carteira secundária."
                 wallet={secondary}
+                source={primary}
                 onSaved={() => setJustSaved(true)}
               />
-            </div>
+            </>
           )}
         </div>
       </div>

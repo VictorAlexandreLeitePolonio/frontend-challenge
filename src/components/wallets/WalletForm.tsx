@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangle, ChevronDown } from 'lucide-react'
 import { useState } from 'react'
 import { Controller, useForm, type DefaultValues } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -31,7 +31,7 @@ interface FieldProps {
 function Field({ id, label, optional = false, error, children }: FieldProps) {
   return (
     <div className="flex flex-col gap-1.5">
-      <Label htmlFor={id}>
+      <Label htmlFor={id} className="font-normal">
         {label} {optional ? <span className="text-xs font-normal text-muted-foreground">(opcional)</span> : <span className="text-primary" aria-hidden="true">*</span>}
       </Label>
       {children}
@@ -71,18 +71,21 @@ function defaultsFor(wallet: Wallet | undefined): DefaultValues<WalletFormValues
 
 interface WalletFormProps {
   slot: WalletSlot
+  /** Carteira existente: o formulário atualiza. */
   wallet?: Wallet
+  /** Valores iniciais para uma carteira nova (ex.: cópia da principal). */
+  source?: Wallet
   onSaved: (wallet: Wallet) => void
   onCancel?: () => void
 }
 
-export function WalletForm({ slot, wallet, onSaved, onCancel }: WalletFormProps) {
+export function WalletForm({ slot, wallet, source, onSaved, onCancel }: WalletFormProps) {
   const createWallet = useCreateWallet()
   const updateWallet = useUpdateWallet()
   const [formError, setFormError] = useState<string | null>(null)
   const form = useForm<WalletFormValues>({
     resolver: zodResolver(walletInputSchema.omit({ slot: true })),
-    defaultValues: defaultsFor(wallet),
+    defaultValues: defaultsFor(wallet ?? source),
   })
   const pending = createWallet.isPending || updateWallet.isPending
   const displayNameId = `wallet-${slot}-display-name`
@@ -112,7 +115,7 @@ export function WalletForm({ slot, wallet, onSaved, onCancel }: WalletFormProps)
   })
 
   return (
-    <form noValidate onSubmit={onSubmit} className="mt-6 flex flex-col gap-6">
+    <form noValidate onSubmit={onSubmit} className="flex flex-col gap-6">
       {formError && (
         <div role="alert" className="flex items-start gap-2 rounded-sm border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
           <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
@@ -267,24 +270,28 @@ export function WalletForm({ slot, wallet, onSaved, onCancel }: WalletFormProps)
         </Field>
 
         <Field id={ensId} label="Nome ENS" error={form.formState.errors.ensName?.message}>
-          <div className="relative">
+          <div className="flex gap-2.5">
+            <span
+              aria-hidden="true"
+              className="flex h-10 w-[78px] shrink-0 items-center justify-between rounded-sm border border-border bg-background/40 px-2.5 text-sm text-muted-foreground"
+            >
+              .eth
+              <ChevronDown className="size-5" />
+            </span>
             <Input
               id={ensId}
               placeholder="seunome"
-              className={`${fieldClass} pr-14`}
+              className={`${fieldClass} min-w-0 flex-1`}
               aria-invalid={Boolean(form.formState.errors.ensName)}
               aria-describedby={form.formState.errors.ensName ? `${ensId}-error` : undefined}
               {...form.register('ensName')}
             />
-            <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground" aria-hidden="true">
-              .eth
-            </span>
           </div>
         </Field>
       </div>
 
       <div className="flex flex-wrap gap-3">
-        <Button type="submit" disabled={pending} className="h-10 px-6">
+        <Button type="submit" disabled={pending} className="h-10 min-w-[131px] px-3">
           {pending ? 'Salvando…' : 'Salvar carteira'}
         </Button>
         {onCancel && (
