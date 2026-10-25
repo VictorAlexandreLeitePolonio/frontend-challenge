@@ -7,7 +7,7 @@ Implementação do desafio frontend ([enunciado](docs/CHALLENGE.md)): descoberta
 | Documento | Conteúdo |
 | --- | --- |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Camadas, contratos REST, eventos Socket.IO, sessão, carrinho, checkout, cache e desvios do Figma, com diagramas |
-| [docs/DECISIONS.md](docs/DECISIONS.md) | 20 decisões técnicas: contexto, alternativas descartadas e custo aceito |
+| [docs/DECISIONS.md](docs/DECISIONS.md) | 21 decisões técnicas: contexto, alternativas descartadas e custo aceito |
 | [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) | Cada requisito do enunciado → código → teste que o comprova |
 | [docs/BUGS.md](docs/BUGS.md) | Bugs encontrados na verificação, com causa raiz e correção |
 | [docs/LIGHTHOUSE.md](docs/LIGHTHOUSE.md) | Medianas, LCP/CLS/TBT, ambiente e análise |

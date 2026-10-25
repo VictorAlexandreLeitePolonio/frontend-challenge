@@ -178,3 +178,13 @@ O caminho crítico mobile é bootstrap → MSW → app → `/api/nfts` → image
 **Decisão.** Um formulário e um botão, como no Figma. O submit envia o perfil só se ele mudou e a troca de senha só se algum campo de senha foi preenchido, em paralelo (`Promise.allSettled`). Cada erro da API volta para o campo da request que falhou, e o toast diz exatamente o que foi salvo.
 
 **Por quê.** Revisa a decisão anterior (dois botões). O risco de sucesso parcial ambíguo foi resolvido com o retorno por campo e o toast específico.
+
+---
+
+## 21. Stub do `tough-cookie` no bundle dos mocks
+
+**Decisão.** Alias de `tough-cookie` para um stub mínimo (`src/mocks/tough-cookie-stub.ts`).
+
+**Por quê.** Era ~55% do chunk que bloqueia o primeiro render (o MSW precisa subir antes do app). A home mobile estava em 89, abaixo da meta, e foi para 95 ([LIGHTHOUSE.md](LIGHTHOUSE.md#home-mobile-de-89-para-95-o-cookie-jar-que-ninguém-usava)).
+
+**Custo.** Handlers não podem usar cookies enquanto o alias existir. O comentário no stub diz quando removê-lo.

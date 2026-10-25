@@ -103,9 +103,9 @@ export function OrderReceipt({ orderId, receipt }: OrderReceiptProps) {
             <h2 className="text-sm leading-4 font-bold">Detalhes da transação</h2>
 
             <div className="mt-3">
-              <div className="grid grid-cols-[minmax(0,1fr)_64px_80px] items-baseline border-b border-border-soft pb-3 text-base leading-4 font-bold md:grid-cols-[minmax(0,1fr)_116px_77px]">
+              <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3 border-b border-border-soft pb-3 text-base leading-4 font-bold md:grid-cols-[minmax(0,1fr)_116px_77px] md:gap-x-0">
                 <span>NFTs</span>
-                <span>Edições</span>
+                <span className="hidden md:block">Edições</span>
                 <span>Subtotal</span>
               </div>
 
@@ -113,7 +113,7 @@ export function OrderReceipt({ orderId, receipt }: OrderReceiptProps) {
                 {receipt.items.map((item) => (
                   <li
                     key={`${item.nftId}-${item.editionId}`}
-                    className="grid h-[70px] grid-cols-[minmax(0,1fr)_64px_80px] items-center md:grid-cols-[minmax(0,1fr)_116px_90px]"
+                    className="grid min-h-[70px] grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 md:grid-cols-[minmax(0,1fr)_116px_90px] md:gap-x-0"
                   >
                     <div className="flex min-w-0 items-center gap-3">
                       <img
@@ -121,14 +121,15 @@ export function OrderReceipt({ orderId, receipt }: OrderReceiptProps) {
                         alt={`Arte do NFT ${item.name}`}
                         loading="lazy"
                         decoding="async"
-                        className="h-[70px] w-[70px] shrink-0 rounded object-cover"
+                        className="size-14 shrink-0 rounded object-cover md:size-[70px]"
                       />
                       <div className="min-w-0">
-                        <p className="truncate text-base leading-4 font-bold">{item.name}</p>
-                        <p className="mt-1.5 text-sm leading-4 text-subtle">ID do token: {item.tokenId}</p>
+                        <p className="line-clamp-2 text-sm leading-4 font-bold md:truncate md:text-base">{item.name}</p>
+                        <p className="mt-1.5 text-xs leading-4 text-subtle md:text-sm">ID do token: {item.tokenId}</p>
+                        <p className="mt-1 text-xs text-muted-foreground md:hidden">Quantidade: {item.quantity}</p>
                       </div>
                     </div>
-                    <span className="text-sm text-muted-foreground">(x {item.quantity})</span>
+                    <span className="hidden text-sm text-muted-foreground md:block">(x {item.quantity})</span>
                     <EthPrice value={item.lineTotal} className="text-base text-accent-text" />
                   </li>
                 ))}

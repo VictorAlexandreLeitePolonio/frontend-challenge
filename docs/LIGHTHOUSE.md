@@ -4,10 +4,10 @@ Páginas: início (`/`) e detalhe do NFT (`/nft/emerald-ape-042`). Build otimiza
 
 | Página | Perfil | Performance | Accessibility | Best Practices | SEO | LCP | CLS | TBT |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Início | Desktop | 100 | 100 | 100 | 100 | 0,81 s | 0 | 0 ms |
-| Detalhe | Desktop | 99 | 100 | 100 | 100 | 0,80 s | 0 | 0 ms |
-| Início | Mobile | 89 | 100 | 100 | 100 | 3,42 s | 0 | 12 ms |
-| Detalhe | Mobile | 91 | 100 | 100 | 100 | 3,26 s | 0 | 14 ms |
+| Início | Desktop | 100 | 100 | 100 | 100 | 0,69 s | 0 | 0 ms |
+| Detalhe | Desktop | 100 | 100 | 100 | 100 | 0,67 s | 0 | 0 ms |
+| Início | Mobile | 95 | 100 | 100 | 100 | 2,81 s | 0 | 14 ms |
+| Detalhe | Mobile | 96 | 100 | 100 | 100 | 2,67 s | 0 | 18 ms |
 
 Relatórios HTML/JSON de todas as execuções: `lighthouse-reports/desktop` e `lighthouse-reports/mobile`. Configuração versionada: `lighthouserc.desktop.json` e `lighthouserc.mobile.json`.
 
@@ -41,4 +41,23 @@ A auditoria foi refeita depois da rodada de fidelidade. Duas regressões de aces
 - **Contraste do link "EXPLORAR" do herói mobile (3,87:1).** Com o texto curto do Figma, o link passou a ficar sobre o círculo decorativo `#674228`. Recebeu um laranja um tom mais claro (`#f3b06f`, 4,71:1).
 - **Alvos de toque de 12 px nos pontos do carrossel do detalhe.** Voltaram a ter 24 × 24 px, com o ponto visual de 7 px dentro.
 
-A variação de 1 ponto na performance mobile da home (90 → 89) está dentro do ruído entre execuções com throttling de 4G lento. O LCP se mantém em ~3,4 s.
+Depois disso a home mobile estava em 89, abaixo da meta de 90. A investigação está na seção seguinte.
+
+## Home mobile de 89 para 95: o cookie jar que ninguém usava
+
+**Diagnóstico.** O elemento de LCP no mobile não é o herói: é a imagem de um card da grade (2º da coluna esquerda). Dois problemas na cadeia:
+
+1. **A imagem era `lazy`.** A grade masonry mobile só priorizava o 1º card de uma coluna. Agora os 2 primeiros de cada coluna (a primeira dobra) são `eager` + `fetchpriority="high"`. Sozinho, isso não mudou a nota: a imagem só entra no DOM depois de JS → MSW → app → `/api/nfts`.
+2. **O chunk do MSW, que precisa carregar antes do primeiro render, tinha 464 KB.** O source map mostrou ~258 KB de `tough-cookie` + `tldts` (cookie jar com a lista pública de sufixos de domínio), que o MSW usa só para emular `document.cookie`. Esta API não usa cookies: o token vai no header `Authorization`, e `grep cookie src/` volta vazio.
+
+**Correção.** Alias no Vite de `tough-cookie` para um stub de 20 linhas com a mesma interface que o MSW usa (`src/mocks/tough-cookie-stub.ts`). O chunk caiu para **170 KB**, e a suíte E2E inteira (110 testes, que dependem do MSW para REST e Socket.IO) passou sem alteração.
+
+| Home mobile | Antes | Depois |
+| --- | ---: | ---: |
+| Performance | 89 | **95** |
+| FCP | 2,1 s | 1,8 s |
+| LCP | 3,4 s | 2,8 s |
+
+Não é uma simplificação para o Lighthouse: o mesmo bundle vai para produção, e a funcionalidade removida (cookies nos mocks) não existe na entrega. Se um handler passar a usar cookies, o alias sai.
+
+**Atenção ao medir localmente.** `npm run dev` serve módulos ES sem bundle e sem minificação; a mesma home mobile marca ~38 no Lighthouse (LCP ~40 s). As medições valem para `npm run build && npm run preview`, que é o que `npm run lighthouse` faz.

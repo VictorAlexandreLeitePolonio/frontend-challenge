@@ -207,13 +207,14 @@ function MasonryGrid({ items }: { items: NftSummary[] }) {
   return (
     <div className="mt-4 flex items-start gap-4 md:hidden">
       <div className="flex min-w-0 flex-1 flex-col gap-6">
+        {/* primeira dobra do mobile: os 2 primeiros de cada coluna (o LCP costuma ser um deles) */}
         {left.map((nft, index) => (
-          <NftCard key={nft.id} nft={nft} priority={index === 0} />
+          <NftCard key={nft.id} nft={nft} priority={index < 2} />
         ))}
       </div>
       <div className="flex min-w-0 flex-1 flex-col gap-6 pt-8">
-        {right.map((nft) => (
-          <NftCard key={nft.id} nft={nft} />
+        {right.map((nft, index) => (
+          <NftCard key={nft.id} nft={nft} priority={index < 2} />
         ))}
       </div>
     </div>
