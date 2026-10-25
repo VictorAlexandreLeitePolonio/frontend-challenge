@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Search, SlidersHorizontal } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { cn } from '@/lib/utils'
 import { useCatalogSearch } from './useCatalogSearch'
 
 interface CatalogSearchBarProps {
@@ -9,9 +10,18 @@ interface CatalogSearchBarProps {
   inputId?: string
   activeFilters: number
   onOpenFilters: () => void
+  /** Campo menor, integrado à barra de ferramentas do catálogo desktop. */
+  compact?: boolean
+  className?: string
 }
 
-export function CatalogSearchBar({ inputId = 'catalog-search', activeFilters, onOpenFilters }: CatalogSearchBarProps) {
+export function CatalogSearchBar({
+  inputId = 'catalog-search',
+  activeFilters,
+  onOpenFilters,
+  compact = false,
+  className,
+}: CatalogSearchBarProps) {
   const { search, update } = useCatalogSearch()
   const [value, setValue] = useState(search.q ?? '')
   const lastUrlValue = useRef(search.q ?? '')
@@ -42,14 +52,20 @@ export function CatalogSearchBar({ inputId = 'catalog-search', activeFilters, on
     <form
       role="search"
       aria-label="Buscar no catálogo"
-      className="flex items-center gap-3"
+      className={cn('flex items-center gap-2', className)}
       onSubmit={(event) => {
         event.preventDefault()
         applyNow()
       }}
     >
-      <div className="relative flex-1">
-        <Search className="pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+      <div className="relative min-w-0 flex-1">
+        <Search
+          className={cn(
+            'pointer-events-none absolute top-1/2 -translate-y-1/2 text-muted-foreground',
+            compact ? 'left-3 size-4' : 'left-3 size-[22px]',
+          )}
+          aria-hidden="true"
+        />
         <label htmlFor={inputId} className="sr-only">
           Explorar coleções
         </label>
@@ -58,7 +74,10 @@ export function CatalogSearchBar({ inputId = 'catalog-search', activeFilters, on
           value={value}
           onChange={(event) => setValue(event.target.value)}
           placeholder="Explorar coleções"
-          className="h-11 rounded-full border-0 bg-card pr-4 pl-11 text-sm placeholder:text-subtle"
+          className={cn(
+            'rounded-full border-0 bg-card placeholder:text-subtle',
+            compact ? 'h-8 pr-3 pl-8 text-xs' : 'h-[45px] pr-4 pl-10 text-sm',
+          )}
           autoComplete="off"
           maxLength={80}
         />
@@ -69,7 +88,7 @@ export function CatalogSearchBar({ inputId = 'catalog-search', activeFilters, on
         className="relative size-[45px] shrink-0 rounded-xl p-0 md:hidden"
         aria-label={activeFilters > 0 ? `Abrir filtros, ${activeFilters} ativos` : 'Abrir filtros'}
       >
-        <SlidersHorizontal className="size-5" aria-hidden="true" />
+        <SlidersHorizontal className="size-[22px]" aria-hidden="true" />
         {activeFilters > 0 && (
           <span
             className="absolute -top-1 -right-1 grid min-w-4 place-items-center rounded-full bg-background px-1 text-[10px] leading-4 font-bold text-foreground"

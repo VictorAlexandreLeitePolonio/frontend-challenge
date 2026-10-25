@@ -37,31 +37,30 @@ export function CatalogBlog() {
   return (
     <section aria-labelledby="blog-title" className="mt-16 md:mt-24">
       <div className="text-center">
-        <h2 id="blog-title" className="text-2xl font-bold">
+        <h2 id="blog-title" className="text-2xl leading-[37px] font-bold">
           Diário da Cunhagem
         </h2>
-        <p className="mx-auto mt-3 max-w-[720px] text-sm leading-6 text-muted-foreground">
+        <p className="mx-auto mt-3 max-w-[720px] text-xs leading-[18px] text-muted-foreground">
           Histórias, guias e insights para colecionadores sobre o universo da propriedade digital.
         </p>
       </div>
-      <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-[repeat(4,268px)] xl:justify-start">
         {POSTS.map((post) => (
           <article key={post.id} className="flex flex-col overflow-hidden bg-card">
             <img
-              {...nftImageProps(post.image, '(min-width: 1024px) 285px, (min-width: 640px) 45vw, 90vw')}
+              {...nftImageProps(post.image, '(min-width: 1280px) 268px, (min-width: 640px) 45vw, 90vw')}
               alt=""
               loading="lazy"
               decoding="async"
-              className="aspect-[285/150] w-full object-cover"
+              className="aspect-[268/195] w-full object-cover"
             />
-            <div className="flex flex-1 flex-col gap-2 p-4">
-              <p className="text-xs leading-5 text-muted-foreground">{post.meta}</p>
-              <h3 className="text-sm leading-5 font-bold">{post.title}</h3>
-              <p className="text-xs leading-5 text-muted-foreground">{post.description}</p>
-              <ComingSoon className="mt-auto inline-flex items-center gap-2 pt-3 text-xs font-bold text-accent-text">
+            <div className="flex min-h-[174px] flex-1 flex-col gap-1.5 p-4">
+              <p className="min-h-8 text-xs leading-4 text-muted-foreground">{post.meta}</p>
+              <h3 className="text-sm leading-[21px] font-bold">{post.title}</h3>
+              <p className="text-xs leading-4 text-muted-foreground">{post.description}</p>
+              <ComingSoon className="mt-auto inline-flex items-center gap-2 pt-2 text-xs font-bold text-accent-text opacity-100">
                 Ler mais
-                <ArrowRight className="size-3.5" aria-hidden="true" />
-                <span className="text-subtle">Em breve</span>
+                <ArrowRight className="size-3" aria-hidden="true" />
               </ComingSoon>
             </div>
           </article>

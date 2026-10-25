@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
+import { useIsDesktop } from '@/components/auth/useIsDesktop'
 import { EmptyState } from '@/components/common/EmptyState'
 import { ErrorState } from '@/components/common/ErrorState'
 import { NftCard } from '@/components/common/NftCard'
@@ -26,7 +27,7 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import { useNfts } from '@/hooks/useNfts'
-import { nftListParamsSchema, type NftTab } from '@/schemas/nft'
+import { nftListParamsSchema, type NftTab, type NftSummary } from '@/schemas/nft'
 
 export const Route = createFileRoute('/')({
   validateSearch: nftListParamsSchema,
@@ -35,6 +36,7 @@ export const Route = createFileRoute('/')({
 
 function Page() {
   const { search, update, reset } = useCatalogSearch()
+  const isDesktop = useIsDesktop()
   const [filtersOpen, setFiltersOpen] = useState(false)
   const query = useNfts({ ...search, pageSize: search.pageSize ?? 9 })
   const data = query.data
@@ -52,7 +54,7 @@ function Page() {
   const changeTab = (next: NftTab) => update({ tab: next === 'all' ? undefined : next })
 
   return (
-    <PageContainer className="pt-4 md:pt-0">
+    <PageContainer className="px-6 pt-10 md:px-6 md:pt-0 xl:px-0">
       <div className="mb-4 md:hidden">
         <CatalogSearchBar activeFilters={activeFilters} onOpenFilters={() => setFiltersOpen(true)} />
       </div>
@@ -65,27 +67,35 @@ function Page() {
           Catálogo de NFTs
         </h2>
         <div className="grid gap-10 md:grid-cols-[260px_minmax(0,1fr)] md:gap-8 lg:grid-cols-[310px_minmax(0,1fr)] lg:gap-12">
-          <aside className="hidden flex-col gap-8 md:flex" aria-label="Filtros do catálogo">
+          <aside className="hidden flex-col gap-6 md:flex" aria-label="Filtros do catálogo">
             {query.isPending && !data && (
               <>
-                <CatalogFiltersSkeleton />
+                <div className="bg-card px-4 pt-4 pb-7">
+                  <CatalogFiltersSkeleton />
+                </div>
                 <SkeletonFeatured />
               </>
             )}
             {data && (
               <>
-                <CatalogFilters facets={data.facets} />
+                <div className="bg-card px-4 pt-4 pb-7">
+                  <CatalogFilters facets={data.facets} />
+                </div>
                 {featured && <FeaturedNftCard nft={featured} />}
               </>
             )}
           </aside>
 
           <div className="min-w-0">
-            <div className="mb-8 hidden md:block">
-              <CatalogSearchBar inputId="catalog-search-desktop" activeFilters={activeFilters} onOpenFilters={() => setFiltersOpen(true)} />
-            </div>
-            <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
+            <div className="flex flex-col gap-5 md:flex-row md:flex-wrap md:items-center md:justify-between md:gap-0 xl:flex-nowrap">
               <CatalogTabs value={tab} onChange={changeTab} />
+              <CatalogSearchBar
+                inputId="catalog-search-desktop"
+                activeFilters={activeFilters}
+                onOpenFilters={() => setFiltersOpen(true)}
+                compact
+                className="hidden md:flex md:w-[170px]"
+              />
               <CatalogSort
                 value={search.sort ?? 'recent'}
                 onChange={(sort) => update({ sort: sort === 'recent' ? undefined : sort })}
@@ -93,16 +103,34 @@ function Page() {
               />
             </div>
 
-            <div className="mt-3 min-h-5 text-xs text-muted-foreground" aria-live="polite">
+            <div
+              className="h-0 overflow-hidden text-xs text-muted-foreground md:mt-1 md:h-4"
+              aria-live="polite"
+            >
               {query.isFetching && !query.isPending ? 'Atualizando resultados…' : ''}
             </div>
 
             {query.isPending && !data && (
-              <div className="grid grid-cols-2 gap-x-4 gap-y-6 md:gap-x-8 md:gap-y-12 lg:grid-cols-3">
-                {Array.from({ length: 9 }, (_, index) => (
-                  <NftCardSkeleton key={index} />
-                ))}
-              </div>
+              isDesktop ? (
+                <div className="grid grid-cols-2 gap-x-4 gap-y-6 md:gap-y-12 lg:grid-cols-3 lg:gap-x-[34px] lg:gap-y-[72px]">
+                  {Array.from({ length: 9 }, (_, index) => (
+                    <NftCardSkeleton key={index} />
+                  ))}
+                </div>
+              ) : (
+                <div className="mt-4 flex items-start gap-4">
+                  <div className="flex min-w-0 flex-1 flex-col gap-6">
+                    {Array.from({ length: 5 }, (_, index) => (
+                      <NftCardSkeleton key={index} />
+                    ))}
+                  </div>
+                  <div className="flex min-w-0 flex-1 flex-col gap-6 pt-8">
+                    {Array.from({ length: 4 }, (_, index) => (
+                      <NftCardSkeleton key={index} />
+                    ))}
+                  </div>
+                </div>
+              )
             )}
 
             {query.isError && !data && (
@@ -139,11 +167,15 @@ function Page() {
 
             {data && data.items.length > 0 && (
               <>
-                <div className="grid grid-cols-2 gap-x-4 gap-y-6 md:gap-x-8 md:gap-y-12 lg:grid-cols-3">
-                  {data.items.map((nft, index) => (
-                    <NftCard key={nft.id} nft={nft} priority={index < 3} />
-                  ))}
-                </div>
+                {isDesktop ? (
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-6 md:gap-y-12 lg:grid-cols-3 lg:gap-x-[34px] lg:gap-y-[72px]">
+                    {data.items.map((nft, index) => (
+                      <NftCard key={nft.id} nft={nft} priority={index < 3} />
+                    ))}
+                  </div>
+                ) : (
+                  <MasonryGrid items={data.items} />
+                )}
                 <CatalogPagination
                   page={data.page}
                   totalPages={data.totalPages}
@@ -176,12 +208,33 @@ function Page() {
   )
 }
 
+/** Grade masonry de duas colunas do Figma mobile: a direita começa 32px mais abaixo. */
+function MasonryGrid({ items }: { items: NftSummary[] }) {
+  const left = items.filter((_, index) => index % 2 === 0)
+  const right = items.filter((_, index) => index % 2 === 1)
+
+  return (
+    <div className="mt-4 flex items-start gap-4 md:hidden">
+      <div className="flex min-w-0 flex-1 flex-col gap-6">
+        {left.map((nft, index) => (
+          <NftCard key={nft.id} nft={nft} priority={index === 0} />
+        ))}
+      </div>
+      <div className="flex min-w-0 flex-1 flex-col gap-6 pt-8">
+        {right.map((nft) => (
+          <NftCard key={nft.id} nft={nft} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
 function SkeletonFeatured() {
   return (
-    <div className="bg-card p-5" aria-hidden="true">
-      <Skeleton className="h-5 w-36" />
-      <Skeleton className="mt-3 h-4 w-32" />
-      <Skeleton className="mt-5 aspect-[310/368] w-full rounded-sm" />
+    <div className="pt-6" aria-hidden="true">
+      <Skeleton className="mx-5 h-8 w-44" />
+      <Skeleton className="mx-auto mt-4 h-4 w-36" />
+      <Skeleton className="mt-4 aspect-[310/368] w-full rounded-2xl" />
     </div>
   )
 }

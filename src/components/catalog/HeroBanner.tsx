@@ -5,38 +5,83 @@ import { scrollToCatalog } from './scrollToCatalog'
 
 export function HeroBanner() {
   return (
-    <section aria-labelledby="hero-title" className="relative overflow-hidden rounded-3xl bg-card md:mt-8 md:rounded-[30px]">
-      <div className="pointer-events-none absolute -top-24 left-1/3 size-[420px] rounded-full bg-surface-dark/60 md:hidden" aria-hidden="true" />
-      <div className="relative grid items-center gap-4 p-4 md:grid-cols-[1fr_450px] md:gap-10 md:p-0 md:pl-10">
-        <div className="flex flex-col gap-3 pr-[136px] md:gap-6 md:py-11 md:pr-0">
-          <p className="text-xs font-bold md:text-sm">Bem-vindo à Kurio</p>
-          <h1 id="hero-title" className="text-lg leading-7 font-bold md:max-w-none md:text-[43px] md:leading-[70px]">
-            <span className="md:hidden">SEJA DONO DA CULTURA DIGITAL</span>
+    <section
+      aria-labelledby="hero-title"
+      className="relative overflow-hidden rounded-3xl bg-card md:mt-8 md:h-[450px] md:rounded-[30px] md:bg-transparent"
+    >
+      <div className="pointer-events-none absolute inset-0 bg-primary/5 md:hidden" aria-hidden="true" />
+      <div className="pointer-events-none absolute top-[-31px] left-[-80px] size-[248px] rounded-full bg-primary/35 md:hidden" aria-hidden="true" />
+      <div className="pointer-events-none absolute top-[-10px] left-[73px] size-[248px] rounded-full bg-primary/15 md:hidden" aria-hidden="true" />
+
+      <div className="relative h-[190px] px-4 pt-1.5 md:h-[450px] md:px-0 md:pt-[43px] md:pl-10">
+        <div className="flex w-[52%] flex-col md:w-[600px]">
+          <p className="text-xs leading-4 md:text-sm md:leading-4">Bem-vindo à Kurio</p>
+          <h1
+            id="hero-title"
+            className="text-base leading-[29px] font-bold md:mt-2 md:text-[43px] md:leading-[70px]"
+          >
+            <span className="md:hidden">
+              SEJA DONO DA
+              <br />
+              CULTURA DIGITAL
+            </span>
             <span className="hidden md:inline">
               SEJA DONO DO FUTURO
               <br />
               DA ARTE DIGITAL
             </span>
           </h1>
-          <p className="text-xs leading-5 text-muted-foreground md:max-w-[557px] md:text-sm md:leading-6">
-            Descubra NFTs selecionados de criadores emergentes e consagrados. Colecione arte digital rara, apoie artistas e tenha uma parte da cultura da internet.
+          <p className="mt-1.5 text-[11px] leading-[17px] text-muted-foreground min-[414px]:text-xs min-[414px]:leading-[18px] md:mt-1 md:max-w-[557px] md:text-sm md:leading-6">
+            Descubra NFTs selecionados de criadores emergentes e consagrados. Colecione arte digital rara, apoie artistas e tenha uma
+            parte da cultura da internet.
           </p>
-          <Button onClick={scrollToCatalog} className="w-fit md:h-10 md:w-[140px]" size="default">
+          <a
+            href="#catalogo"
+            onClick={(event) => {
+              event.preventDefault()
+              scrollToCatalog()
+            }}
+            className="mt-0.5 flex w-fit items-center gap-1 text-xs font-bold tracking-wide text-accent-text md:hidden"
+          >
             EXPLORAR
-            <ArrowRight className="md:hidden" aria-hidden="true" />
+            <ArrowRight className="size-4" aria-hidden="true" />
+          </a>
+          <Button onClick={scrollToCatalog} className="mt-8 hidden h-10 w-[140px] md:inline-flex">
+            EXPLORAR
           </Button>
         </div>
+
+        <div className="absolute top-2.5 right-4 w-[37.7%] md:hidden">
+          <img
+            {...nftImageProps('emerald-ape', '(min-width: 414px) 138px, 37vw')}
+            alt="Emerald Ape #042, destaque da coleção Kurio Apes"
+            fetchPriority="high"
+            className="aspect-square w-full rounded-2xl object-cover"
+          />
+          <img
+            {...nftImageProps('sage-nomad', '58px')}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            className="absolute top-[63.8%] left-[10%] aspect-square w-[42%] rounded-lg border-2 border-foreground object-cover"
+          />
+        </div>
+
         <img
-          {...nftImageProps('emerald-ape', '(min-width: 768px) 450px, 140px')}
+          {...nftImageProps('emerald-ape', '450px')}
           alt="Emerald Ape #042, destaque da coleção Kurio Apes"
           fetchPriority="high"
-          className="absolute top-4 right-4 aspect-square w-[120px] rounded-2xl object-cover md:static md:w-[450px] md:rounded-[30px]"
+          className="absolute top-0 right-0 hidden h-[450px] w-[450px] rounded-[30px] object-cover md:block"
         />
       </div>
-      <div className="flex justify-center gap-2 pb-4 md:absolute md:bottom-11 md:left-[600px] md:pb-0" aria-hidden="true">
-        <span className="size-2 rounded-full bg-primary" />
-        <span className="size-2 rounded-full bg-primary/60" />
-        <span className="size-2 rounded-full bg-primary/60" />
+
+      <div
+        className="absolute bottom-2.5 left-1/2 flex -translate-x-1/2 gap-1.5 md:bottom-11 md:left-[600px] md:translate-x-0 md:gap-2"
+        aria-hidden="true"
+      >
+        <span className="size-[7px] rounded-full bg-primary md:size-2" />
+        <span className="size-[7px] rounded-full bg-primary md:size-2" />
+        <span className="size-[7px] rounded-full bg-primary md:size-2" />
       </div>
     </section>
   )

@@ -11,7 +11,7 @@ export function CatalogPagination({ page, totalPages, onChange }: CatalogPaginat
   if (totalPages <= 1) return null
 
   return (
-    <nav aria-label="Paginação do catálogo" className="mt-10 flex items-center justify-end gap-2">
+    <nav aria-label="Paginação do catálogo" className="mt-10 flex items-center justify-end gap-2 md:mt-[88px]">
       {Array.from({ length: totalPages }, (_, index) => index + 1).map((number) => {
         const active = number === page
         return (
@@ -22,7 +22,7 @@ export function CatalogPagination({ page, totalPages, onChange }: CatalogPaginat
             aria-label={`Página ${number}`}
             aria-current={active ? 'page' : undefined}
             className={cn(
-              'grid size-9 place-items-center text-sm transition-colors',
+              'grid size-[35px] place-items-center text-sm transition-colors',
               active ? 'bg-primary font-bold text-primary-foreground' : 'text-muted-foreground hover:text-foreground',
             )}
           >
@@ -35,7 +35,7 @@ export function CatalogPagination({ page, totalPages, onChange }: CatalogPaginat
         onClick={() => onChange(page + 1)}
         disabled={page >= totalPages}
         aria-label="Próxima página"
-        className="grid size-9 place-items-center border border-border text-muted-foreground transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
+        className="grid size-[35px] place-items-center border border-border text-muted-foreground transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
       >
         <ChevronRight className="size-4" aria-hidden="true" />
       </button>

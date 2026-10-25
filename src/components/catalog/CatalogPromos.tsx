@@ -26,20 +26,25 @@ export function CatalogPromos() {
       </h2>
       <div className="grid gap-7 sm:grid-cols-2">
         {PROMOS.map((promo) => (
-          <article key={promo.id} className="flex overflow-hidden bg-card">
+          <article key={promo.id} className="flex overflow-hidden bg-card sm:h-[250px]">
             <img
-              {...nftImageProps(promo.image, '(min-width: 640px) 290px, 40vw')}
+              {...nftImageProps(promo.image, '(min-width: 640px) 292px, 40vw')}
               alt=""
               loading="lazy"
               decoding="async"
-              className="w-[38%] shrink-0 object-cover sm:w-[49%]"
+              className="w-[38%] shrink-0 object-cover sm:h-full sm:w-[49.8%]"
             />
-            <div className="flex flex-1 flex-col items-center justify-center gap-3 p-4 text-center sm:p-6">
-              <h3 className="text-sm leading-5 font-bold md:text-base">{promo.title}</h3>
-              <p className="text-xs leading-5 text-muted-foreground md:text-sm md:leading-6">{promo.description}</p>
-              <Button size="sm" onClick={scrollToCatalog} aria-label={`Explorar: ${promo.title}`}>
+            <div className="flex min-w-0 flex-1 flex-col items-end pt-6 pr-[30px] pb-6 text-right sm:pt-[37px]">
+              <h3 className="max-w-[206px] text-sm leading-6 font-bold sm:text-base">{promo.title}</h3>
+              <p className="mt-2.5 text-xs leading-[15px] text-muted-foreground">{promo.description}</p>
+              <Button
+                size="sm"
+                onClick={scrollToCatalog}
+                aria-label={`Explorar: ${promo.title}`}
+                className="mt-6 h-10 w-[140px] text-sm"
+              >
                 Explorar
-                <ArrowRight aria-hidden="true" />
+                <ArrowRight className="size-[18px]" aria-hidden="true" />
               </Button>
             </div>
           </article>
