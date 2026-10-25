@@ -3,6 +3,7 @@ import { ComingSoon } from '@/components/common/ComingSoon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { COLLECTION_LABELS } from '@/schemas/nft'
+import { SocialIcon, type SocialNetwork } from './SocialIcons'
 
 const FEATURES = [
   { letter: 'W', title: 'Segurança da carteira', text: 'Proteja sua carteira e colecione arte digital verificada com confiança.' },
@@ -11,6 +12,7 @@ const FEATURES = [
 ]
 
 const FOOTER_COLLECTIONS = ['digital-art', 'photography', 'music', '3d-art', 'utility'] as const
+const SOCIAL_NETWORKS: SocialNetwork[] = ['facebook', 'instagram', 'x', 'linkedin', 'youtube']
 
 export function Footer() {
   return (
@@ -32,7 +34,7 @@ export function Footer() {
               Seu e-mail
             </label>
             <Input id="newsletter" type="email" placeholder="digite seu e-mail..." className="rounded-none border-0 bg-surface-dark" disabled />
-            <Button type="submit" className="rounded-none" disabled>
+            <Button type="submit" className="rounded-none disabled:opacity-80" disabled>
               Enviar
             </Button>
           </form>
@@ -54,14 +56,16 @@ export function Footer() {
           <h2 className="text-lg font-bold">Meu perfil</h2>
           <Link to="/profile" className="hover:text-accent-text">Meu perfil</Link>
           <Link to="/wallets" className="hover:text-accent-text">Carteiras</Link>
-          <ComingSoon>Atividade</ComingSoon>
-          <ComingSoon>Estúdio do criador</ComingSoon>
-          <ComingSoon>Lista de interesse</ComingSoon>
+          <ComingSoon muted={false}>Atividade</ComingSoon>
+          <ComingSoon muted={false}>Estúdio do criador</ComingSoon>
+          <ComingSoon muted={false}>Lista de interesse</ComingSoon>
         </nav>
         <nav aria-label="Central de ajuda" className="flex flex-col gap-3">
           <h2 className="text-lg font-bold">Central de ajuda</h2>
           {['Central de ajuda', 'Como comprar NFTs', 'Carteira e segurança', 'Política do mercado', 'Denunciar item'].map((label) => (
-            <ComingSoon key={label}>{label}</ComingSoon>
+            <ComingSoon key={label} muted={false}>
+              {label}
+            </ComingSoon>
           ))}
         </nav>
         <nav aria-label="Coleções" className="flex flex-col gap-3">
@@ -75,9 +79,9 @@ export function Footer() {
         <div className="flex flex-col gap-3">
           <h2 className="text-lg font-bold">Redes sociais</h2>
           <ul className="flex gap-2" aria-label="Redes sociais (em breve)">
-            {['f', 'ig', 'x', 'in', 'yt'].map((label) => (
-              <li key={label} className="grid size-8 place-items-center border border-primary text-xs font-bold text-primary" aria-hidden="true">
-                {label}
+            {SOCIAL_NETWORKS.map((network) => (
+              <li key={network} className="grid size-8 place-items-center border border-primary text-primary" aria-hidden="true">
+                <SocialIcon network={network} />
               </li>
             ))}
           </ul>
