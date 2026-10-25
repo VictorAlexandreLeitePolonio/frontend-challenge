@@ -8,6 +8,7 @@ import { ErrorState, errorMessage } from '@/components/common/ErrorState'
 import { PageContainer } from '@/components/layout/PageContainer'
 import { Button } from '@/components/ui/button'
 import { CheckoutForm } from '@/components/checkout/CheckoutForm'
+import { CheckoutRecovery } from '@/components/checkout/CheckoutRecovery'
 import { CheckoutSidebar } from '@/components/checkout/CheckoutSidebar'
 import { CheckoutSkeleton } from '@/components/checkout/CheckoutSkeleton'
 import { QuoteDiff } from '@/components/checkout/QuoteDiff'
@@ -39,7 +40,9 @@ function Page() {
   const wallets = useWallets()
   const profile = useProfile()
   const navigate = useNavigate()
-  const savedOrderId = pendingOrderStore(user.id).get()?.orderId ?? null
+  const storedAttempt = pendingOrderStore(user.id).get()
+  const savedOrderId = storedAttempt?.orderId ?? null
+  const hasUnresolvedAttempt = Boolean(storedAttempt && !storedAttempt.orderId)
 
   useEffect(() => {
     if (!savedOrderId) return
@@ -89,7 +92,22 @@ function Page() {
     )
   }
 
+  if (savedOrderId) {
+    return (
+      <CheckoutShell>
+        <CheckoutSkeleton />
+      </CheckoutShell>
+    )
+  }
+
   if (cart.data.items.length === 0) {
+    if (hasUnresolvedAttempt) {
+      return (
+        <CheckoutShell>
+          <CheckoutRecovery />
+        </CheckoutShell>
+      )
+    }
     return (
       <CheckoutShell>
         <EmptyState
