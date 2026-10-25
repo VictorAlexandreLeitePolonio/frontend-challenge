@@ -1,0 +1,72 @@
+import { Link, useLocation, useNavigate } from '@tanstack/react-router'
+import { Activity, AlertTriangle, Download, Heart, LogOut, ShoppingBag, User, Wallet } from 'lucide-react'
+import { ComingSoon } from '@/components/common/ComingSoon'
+import { useLogout } from '@/hooks/useSession'
+import { cn } from '@/lib/utils'
+
+const itemClass =
+  'flex h-10 shrink-0 items-center gap-2 border-b-2 border-transparent px-3 text-sm whitespace-nowrap transition-colors md:h-[45px] md:gap-4 md:border-b-0 md:border-l-2 md:px-4'
+const activeClass = 'border-primary text-primary'
+const inactiveClass = 'text-foreground hover:text-accent-text'
+
+const OUT_OF_SCOPE = [
+  { label: 'Atividade', icon: ShoppingBag },
+  { label: 'Lista de interesse', icon: Heart },
+  { label: 'Ofertas', icon: Activity },
+  { label: 'Arquivos baixados', icon: Download },
+  { label: 'Suporte', icon: AlertTriangle },
+] as const
+
+export function AccountSidebar() {
+  const { pathname } = useLocation()
+  const navigate = useNavigate()
+  const logout = useLogout()
+
+  const onLogout = () =>
+    logout.mutate(undefined, {
+      onSettled: () => void navigate({ href: '/', replace: true }),
+    })
+
+  return (
+    <aside className="md:w-[310px] md:shrink-0">
+      <div className="border border-border bg-card md:border-0">
+        <h2 className="hidden px-2.5 py-2 text-base font-bold md:block">Meu perfil</h2>
+        <nav aria-label="Conta" className="flex gap-1 overflow-x-auto px-2 md:flex-col md:gap-0 md:px-0">
+          <Link
+            to="/profile"
+            aria-current={pathname === '/profile' ? 'page' : undefined}
+            className={cn(itemClass, pathname === '/profile' ? activeClass : inactiveClass)}
+          >
+            <User className="size-4.5" aria-hidden="true" />
+            Dados do perfil
+          </Link>
+          <Link
+            to="/wallets"
+            aria-current={pathname === '/wallets' ? 'page' : undefined}
+            className={cn(itemClass, pathname === '/wallets' ? activeClass : inactiveClass)}
+          >
+            <Wallet className="size-4.5" aria-hidden="true" />
+            Carteiras
+          </Link>
+          {OUT_OF_SCOPE.map(({ label, icon: Icon }) => (
+            <ComingSoon key={label} className={cn(itemClass, inactiveClass)}>
+              <span className="flex items-center gap-2 md:gap-4">
+                <Icon className="size-4.5" aria-hidden="true" />
+                {label}
+              </span>
+            </ComingSoon>
+          ))}
+          <button
+            type="button"
+            onClick={onLogout}
+            disabled={logout.isPending}
+            className={cn(itemClass, inactiveClass, 'mt-0 border-t border-border md:mt-2 md:w-full md:text-left')}
+          >
+            <LogOut className="size-4.5" aria-hidden="true" />
+            {logout.isPending ? 'Saindo…' : 'Sair'}
+          </button>
+        </nav>
+      </div>
+    </aside>
+  )
+}

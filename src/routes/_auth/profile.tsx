@@ -1,16 +1,46 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { ErrorState } from '@/components/common/ErrorState'
 import { PageContainer } from '@/components/layout/PageContainer'
+import { AccountSidebar } from '@/components/profile/AccountSidebar'
+import { PasswordForm } from '@/components/profile/PasswordForm'
+import { ProfileForm } from '@/components/profile/ProfileForm'
+import { ProfileSkeleton } from '@/components/profile/ProfileSkeleton'
+import { useProfile } from '@/hooks/useAccount'
 
 export const Route = createFileRoute('/_auth/profile')({
   component: Page,
 })
 
-// Placeholder da fundação: tela implementada pelos agentes (docs/superpowers/plans/2026-10-25-agents.md).
 function Page() {
+  const profile = useProfile()
+
   return (
-    <PageContainer className="py-12">
-      <h1 className="text-2xl font-bold">Perfil do colecionador</h1>
-      <p className="text-muted-foreground">Em construção.</p>
+    <PageContainer className="pt-8 pb-16">
+      <div className="grid gap-7 md:grid-cols-[310px_minmax(0,1fr)]">
+        <AccountSidebar />
+        <section aria-labelledby="profile-title">
+          <h1 id="profile-title" className="text-base font-bold">
+            Perfil do colecionador
+          </h1>
+          <div className="mt-8">
+            {profile.isPending && <ProfileSkeleton />}
+            {profile.isError && (
+              <ErrorState
+                error={profile.error}
+                title="Não foi possível carregar o perfil"
+                onRetry={() => void profile.refetch()}
+                isRetrying={profile.isFetching}
+              />
+            )}
+            {profile.data && (
+              <>
+                <ProfileForm profile={profile.data} />
+                <PasswordForm />
+              </>
+            )}
+          </div>
+        </section>
+      </div>
     </PageContainer>
   )
 }
