@@ -209,7 +209,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
               accept="image/*"
               className="sr-only"
               tabIndex={-1}
-              aria-hidden="true"
+              aria-label="Selecionar imagem de avatar"
               onChange={handleFile}
             />
             <Button
