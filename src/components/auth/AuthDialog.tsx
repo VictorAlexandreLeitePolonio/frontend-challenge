@@ -56,7 +56,7 @@ export function AuthDialog({ mode, redirect }: AuthDialogProps) {
   return (
     <DialogPrimitive.Root open onOpenChange={(open) => !open && close()}>
       <DialogPrimitive.Portal>
-        <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/25" />
+        <DialogPrimitive.Overlay className="fixed inset-0 z-50" />
         <DialogPrimitive.Content
           className={cn(
             'fixed z-50 flex flex-col overflow-y-auto bg-card text-foreground outline-none',
@@ -64,6 +64,13 @@ export function AuthDialog({ mode, redirect }: AuthDialogProps) {
               ? cn('top-1/2 left-1/2 max-h-[calc(100dvh-2rem)] w-[500px] max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2', DESKTOP_HEIGHT[mode])
               : 'inset-0 h-dvh bg-background',
           )}
+          // Foco inicial no primeiro campo (não no X), como num formulário de login
+          onOpenAutoFocus={(event) => {
+            const input = (event.currentTarget as HTMLElement).querySelector('input')
+            if (!input) return
+            event.preventDefault()
+            input.focus()
+          }}
         >
           <DialogPrimitive.Title className="sr-only">{copy.title}</DialogPrimitive.Title>
           <DialogPrimitive.Close asChild>

@@ -15,8 +15,12 @@ export function RelatedNfts({ collection, currentNftId }: RelatedNftsProps) {
   const scrollerId = useId()
   const scrollerRef = useRef<HTMLDivElement>(null)
   const [active, setActive] = useState(0)
-  const query = useNfts({ collections: [collection], pageSize: 5 })
-  const items = (query.data?.items ?? []).filter((nft) => nft.id !== currentNftId)
+  const query = useNfts({ collections: [collection], pageSize: 6 })
+  // ponytail: o mock tem só 4 NFTs por coleção; completa com o catálogo até os 5 do Figma, mesma coleção primeiro
+  const fill = useNfts({ pageSize: 8 })
+  const items = [...(query.data?.items ?? []), ...(fill.data?.items ?? [])]
+    .filter((nft, index, all) => nft.id !== currentNftId && all.findIndex((other) => other.id === nft.id) === index)
+    .slice(0, 5)
 
   const scrollTo = (index: number) => {
     const container = scrollerRef.current

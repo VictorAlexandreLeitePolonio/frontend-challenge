@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { createFileRoute, Link, useLocation } from '@tanstack/react-router'
-import { Heart, Loader2, Mail, Send, Share2, Star } from 'lucide-react'
+import { Heart, Loader2, Mail, Star } from 'lucide-react'
+import { SocialIcon } from '@/components/layout/SocialIcons'
 import { toast } from 'sonner'
 import { z } from 'zod'
 import { ApiError } from '@/api/client'
@@ -326,13 +327,13 @@ function NftDetail({ nft }: { nft: Nft }) {
               <span className="font-bold">Compartilhar este NFT:</span>
               <span className="flex items-center gap-2 text-foreground">
                 <ComingSoon className="opacity-100">
-                  <Share2 className="size-4" aria-hidden="true" />
+                  <SocialIcon network="linkedin" />
                 </ComingSoon>
                 <ComingSoon className="opacity-100">
                   <Mail className="size-4" aria-hidden="true" />
                 </ComingSoon>
                 <ComingSoon className="opacity-100">
-                  <Send className="size-4" aria-hidden="true" />
+                  <SocialIcon network="x" />
                 </ComingSoon>
               </span>
             </div>
