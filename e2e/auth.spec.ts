@@ -14,7 +14,7 @@ test('cadastro com validação e conflito de e-mail', async ({ page }) => {
 
   await page.getByLabel('E-mail', { exact: true }).fill('novo@kurio.dev')
   await page.getByRole('button', { name: /^Criar (conta|perfil)$/ }).filter({ visible: true }).last().click()
-  await page.waitForURL((url) => !url.pathname.startsWith('/signup'))
+  await page.waitForURL((url) => !url.searchParams.has('auth'))
   await page.reload()
   await page.goto('/profile')
   await expect(page.getByLabel(/^Nome de usuário/)).toHaveValue('novo_colecionador')
@@ -22,7 +22,7 @@ test('cadastro com validação e conflito de e-mail', async ({ page }) => {
 
 test('login inválido, retorno ao fluxo anterior e logout', async ({ page }) => {
   await page.goto('/profile')
-  await expect(page).toHaveURL(/\/login\?redirect=/)
+  await expect(page).toHaveURL(/auth=login&redirect=/)
   await page.getByLabel('E-mail', { exact: true }).fill(ALICE.email)
   await page.getByLabel('Senha', { exact: true }).fill('errada123')
   await page.getByRole('button', { name: 'Entrar', exact: true }).click()
@@ -35,7 +35,7 @@ test('login inválido, retorno ao fluxo anterior e logout', async ({ page }) => 
 
   await logout(page)
   await page.goto('/profile')
-  await expect(page).toHaveURL(/\/login/)
+  await expect(page).toHaveURL(/auth=login/)
 })
 
 test('sessão expirada durante a navegação volta ao login preservando o destino', async ({ page }) => {
@@ -43,7 +43,7 @@ test('sessão expirada durante a navegação volta ao login preservando o destin
   await expect(page).toHaveURL(/\/wallets/)
   await page.evaluate(() => window.__kurioMock?.expireSessions())
   await page.goto('/profile')
-  await expect(page).toHaveURL(/\/login\?redirect=%2Fprofile/)
+  await expect(page).toHaveURL(/auth=login&redirect=%2Fprofile/)
 })
 
 test.describe('sessão com relógio controlado', () => {
@@ -55,7 +55,7 @@ test.describe('sessão com relógio controlado', () => {
     // TTL de 20 s no cenário: avança o relógio da página (Date e timers) sem esperar de verdade
     await page.clock.runFor(25_000)
     await page.goto('/profile')
-    await expect(page).toHaveURL(/\/login\?redirect=%2Fprofile/)
+    await expect(page).toHaveURL(/auth=login&redirect=%2Fprofile/)
   })
 })
 

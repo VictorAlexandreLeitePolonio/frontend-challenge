@@ -7,7 +7,7 @@ test('compra completa do catálogo ao recibo confirmado', async ({ page }) => {
   await page.getByRole('button', { name: /^comprar( nft)?$/i }).filter({ visible: true }).first().click()
   await page.waitForURL('**/cart')
   await page.getByRole('link', { name: 'Conectar e finalizar' }).filter({ visible: true }).first().click()
-  await expect(page).toHaveURL(/\/login\?redirect=%2Fcheckout/)
+  await expect(page).toHaveURL(/\/\?auth=login&redirect=%2Fcheckout/)
   await page.getByLabel('E-mail', { exact: true }).fill(ALICE.email)
   await page.getByLabel('Senha', { exact: true }).fill(ALICE.password)
   await page.getByRole('button', { name: 'Entrar', exact: true }).click()

@@ -48,7 +48,8 @@ export async function login(page: Page, user = ALICE, redirect?: string) {
   await page.getByLabel('E-mail', { exact: true }).fill(user.email)
   await page.getByLabel('Senha', { exact: true }).fill(user.password)
   await page.getByRole('button', { name: 'Entrar', exact: true }).click()
-  await page.waitForURL((url) => !url.pathname.startsWith('/login'))
+  // /login vira o diálogo `?auth=login` sobre uma página; o login termina quando o diálogo some
+  await page.waitForURL((url) => !url.searchParams.has('auth'))
 }
 
 /** Adiciona um NFT pelo detalhe (botão "COMPRAR" no desktop, "Comprar NFT" no mobile). */

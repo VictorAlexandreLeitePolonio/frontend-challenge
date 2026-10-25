@@ -1,9 +1,9 @@
 import { useQueryClient, type QueryClient } from '@tanstack/react-query'
-import { createRootRouteWithContext, Link, Outlet, useLocation, useRouter } from '@tanstack/react-router'
+import { createRootRouteWithContext, Link, Outlet, useRouter } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
-import { AuthDialog, authPathMode } from '@/components/auth/AuthDialog'
+import { AuthDialog } from '@/components/auth/AuthDialog'
 import { DevPanel } from '@/components/layout/DevPanel'
 import { Footer } from '@/components/layout/Footer'
 import { Header } from '@/components/layout/Header'
@@ -31,8 +31,6 @@ function RootLayout() {
   useRealtimeSync()
   useSessionExpiry()
   const { auth, redirect } = Route.useSearch()
-  const pathname = useLocation({ select: (location) => location.pathname })
-  const authMode = auth ?? authPathMode(pathname)
 
   return (
     <>
@@ -45,7 +43,7 @@ function RootLayout() {
       </main>
       <Footer />
       <MobileTabBar />
-      {authMode && <AuthDialog mode={authMode} redirect={redirect} />}
+      {auth && <AuthDialog mode={auth} redirect={redirect} />}
       <Toaster position="top-right" richColors closeButton />
       <DevPanel />
     </>

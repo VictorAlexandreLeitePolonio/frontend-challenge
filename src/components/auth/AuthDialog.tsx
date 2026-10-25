@@ -6,21 +6,15 @@ import { cn } from '@/lib/utils'
 import { AuthModeLink, AuthTabs, type AuthMode } from './AuthTabs'
 import { LoginForm } from './LoginForm'
 import { SignupForm } from './SignupForm'
-import { publicRedirect, safeRedirect } from './safe-redirect'
+import { safeRedirect } from './safe-redirect'
 import { SocialAuth } from './SocialAuth'
 import { useIsDesktop } from './useIsDesktop'
 
-const AUTH_PATH_MODES: Record<string, AuthMode> = { '/login': 'login', '/signup': 'signup' }
-
-/** Modo do diálogo quando a própria rota é de auth (/login e /signup). */
-export function authPathMode(pathname: string): AuthMode | undefined {
-  return AUTH_PATH_MODES[pathname]
-}
-
-/** Tira só `auth` do href atual: o search tipado da rota da página não conhece esse parâmetro. */
+/** Tira `auth` e `redirect` do href atual: o search tipado da rota da página não conhece esses parâmetros. */
 function withoutAuth(href: string): string {
   const url = new URL(href, 'http://localhost')
   url.searchParams.delete('auth')
+  url.searchParams.delete('redirect')
   return url.pathname + url.search + url.hash
 }
 
@@ -48,17 +42,14 @@ interface AuthDialogProps {
 /** Diálogo de auth sobre a página atual (overlay escuro, sem blur). Renderizado pela raiz. */
 export function AuthDialog({ mode, redirect }: AuthDialogProps) {
   const navigate = useNavigate()
-  const pathname = useLocation({ select: (location) => location.pathname })
   const href = useLocation({ select: (location) => location.href })
   const isDesktop = useIsDesktop()
-  const onAuthPath = authPathMode(pathname) !== undefined
   const copy = COPY[mode]
 
-  const dropAuth = () => navigate({ href: withoutAuth(href), replace: true })
-  // Em /login e /signup o diálogo é a própria página: sair nunca cai numa rota protegida (evita loop com o guard).
-  const close = () => (onAuthPath ? navigate({ href: publicRedirect(redirect), replace: true }) : dropAuth())
-  // Depois de logar: vai ao destino quando há redirect ou se estava numa rota de auth; senão só tira ?auth.
-  const finish = () => (redirect || onAuthPath ? navigate({ href: safeRedirect(redirect), replace: true }) : dropAuth())
+  // Fechar só tira o diálogo: a página atrás é sempre pública, então não há loop com o guard.
+  const close = () => navigate({ href: withoutAuth(href), replace: true })
+  // Depois de logar: vai ao destino quando há redirect; senão permanece na página.
+  const finish = () => (redirect ? navigate({ href: safeRedirect(redirect), replace: true }) : close())
 
   const form = mode === 'login' ? <LoginForm onSuccess={finish} /> : <SignupForm onSuccess={finish} />
 

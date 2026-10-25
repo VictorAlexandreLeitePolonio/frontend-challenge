@@ -41,10 +41,13 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
 
-  --animate-shimmer: shimmer 1.6s linear infinite;
+  --animate-shimmer: shimmer 1.3s ease-in-out infinite;
   @keyframes shimmer {
-    from { background-position: 200% 0; }
-    to { background-position: -200% 0; }
+    from { background-position: 100% 0; }
+    to { background-position: 0% 0; }
+  }
+  @keyframes shimmer-pulse {
+    50% { opacity: 0.55; }
   }
 }
 
@@ -102,10 +105,19 @@
   .shimmer {
     background-color: var(--surface-dark);
     @media (prefers-reduced-motion: no-preference) {
-      background-image: linear-gradient(90deg, transparent 0%, color-mix(in srgb, var(--primary) 18%, transparent) 50%, transparent 100%);
-      background-size: 200% 100%;
+      /* faixa estreita e clara varrendo da esquerda para a direita */
+      background-image: linear-gradient(
+        100deg,
+        transparent 35%,
+        color-mix(in srgb, var(--accent-text) 38%, transparent) 50%,
+        transparent 65%
+      );
+      background-size: 250% 100%;
       animation: var(--animate-shimmer);
-      animation-duration: 1.2s;
+    }
+    /* movimento reduzido: sem deslocamento, só um pulso de opacidade */
+    @media (prefers-reduced-motion: reduce) {
+      animation: shimmer-pulse 1.6s ease-in-out infinite;
     }
   }
 }

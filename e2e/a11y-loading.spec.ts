@@ -18,7 +18,7 @@ test('teclado: pular para o conteúdo, foco visível e diálogo com foco contido
     expect(await dialog.evaluate((el) => el.contains(document.activeElement))).toBe(true)
   }
   await page.keyboard.press('Escape')
-  await expect(page).not.toHaveURL(/\/login/)
+  await expect(page).not.toHaveURL(/auth=/)
 })
 
 test('formulário anuncia erros associados aos campos', async ({ page }) => {

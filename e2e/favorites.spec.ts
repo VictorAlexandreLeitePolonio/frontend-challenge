@@ -13,7 +13,7 @@ test('favoritar persiste para o usuário autenticado', async ({ page }) => {
 test('visitante é levado ao login ao favoritar', async ({ page }) => {
   await page.goto('/nft/emerald-ape-042')
   await page.getByRole('button', { name: 'Favoritar' }).filter({ visible: true }).first().click()
-  await expect(page).toHaveURL(/\/login\?redirect=%2Fnft%2Femerald-ape-042/)
+  await expect(page).toHaveURL(/\/nft\/emerald-ape-042\?.*auth=login&redirect=%2Fnft%2Femerald-ape-042/)
 })
 
 test.describe('falha na mutation', () => {

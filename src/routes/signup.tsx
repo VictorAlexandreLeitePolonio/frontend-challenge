@@ -1,9 +1,11 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { AuthBackdrop } from '@/components/auth/AuthBackdrop'
+import { createFileRoute, redirect } from '@tanstack/react-router'
+import { authHref } from '@/components/auth/safe-redirect'
 import { redirectSearchSchema } from '@/lib/redirect'
 
-/** O diálogo de cadastro é renderizado pela raiz; esta rota só mostra a página atrás dele. */
+/** Guards, sessão expirada e links diretos chegam aqui; o diálogo abre sobre uma página real via `?auth=`. */
 export const Route = createFileRoute('/signup')({
   validateSearch: redirectSearchSchema,
-  component: AuthBackdrop,
+  beforeLoad: ({ search }) => {
+    throw redirect({ href: authHref('signup', search.redirect), replace: true })
+  },
 })
