@@ -88,7 +88,7 @@ Registro das decisões que moldaram a solução, no formato de ADRs curtos: cont
 
 ## 10. Eventos em tempo real: versão, deduplicação e reconciliação
 
-**Decisão.** Todo evento carrega `eventId`, `resource`, `version` e `occurredAt`. O cliente descarta um evento se o `eventId` já foi visto **ou** se a versão é menor ou igual à maior conhecida (do mapa local ou da versão em cache). No `connect` depois de uma queda, invalida catálogo, detalhes, carrinho e pedidos ativos (reconciliação via REST).
+**Decisão.** Todo evento carrega `eventId`, `resource`, `version` e `occurredAt`. O cliente descarta um evento se o `eventId` já foi visto **ou** se a versão é menor ou igual à maior conhecida (do mapa local ou da versão em cache). Em **todo** `connect` (inicial ou reconexão), invalida catálogo, detalhes, carrinho e pedidos cujo dado é anterior ao handshake (reconciliação via REST). A primeira conexão também tem uma janela: um evento emitido entre a resposta REST e o handshake se perderia. O filtro `dataUpdatedAt < connectedAt` evita refetch do que acabou de chegar.
 
 **Por quê.** Uma regra só (`version <= known`) cobre duplicatas, eventos atrasados e reenvios, sem fila de reordenação. Eventos de pedido só são entregues às conexões do dono, validadas pelo token do handshake.
 
@@ -127,7 +127,8 @@ O servidor simulado também envia ping (`"2"`) a cada 20 s. Sem isso, o cliente 
 - **E2E primeiro.** O enunciado avalia comportamento observável. Testes unitários ficaram só para lógica pura e crítica: aritmética ETH e regras de domínio do mock (cotação, confirmação, merge).
 - **Estado isolado.** Cada teste parte de `localStorage` limpo (o banco volta ao seed) e com o cenário injetado antes do primeiro script da página.
 - **Tempo controlado.** `page.clock` no teste de expiração de sessão e na regressão visual, além de cenários de latência determinística.
-- **Visual.** Baselines versionadas de início, detalhe, carrinho e pagamento em desktop e mobile, com toasts mascarados.
+- **Três viewports.** Os projetos `desktop` (1440), `tablet` (768) e `mobile` (390) rodam a suíte inteira. O tablet entrou depois e encontrou um overflow real que os outros dois não viam ([BUGS.md](BUGS.md#9-overflow-e-herói-cortado-em-768-px)).
+- **Visual.** Baselines versionadas de início, detalhe, carrinho e pagamento nos três viewports, com toasts mascarados. Há baselines `darwin` (dev local) e `linux` (geradas na imagem oficial do Playwright via `npm run test:e2e:docker:update`, as mesmas que a CI usa).
 - **Overflow medido contra a largura do dispositivo**, não contra `innerWidth`, que o próprio overflow infla no mobile ([BUGS.md](BUGS.md#3-perfil-e-carteiras-renderizavam-com-991-px-no-mobile)).
 
 ---
@@ -135,3 +136,45 @@ O servidor simulado também envia ping (`"2"`) a cada 20 s. Sem isso, o cliente 
 ## 15. Performance: medir antes de otimizar
 
 O caminho crítico mobile é bootstrap → MSW → app → `/api/nfts` → imagem. Baixar app e MSW em paralelo parecia ganho óbvio, mas **piorou** o LCP de 3,3 s para 4,1 s: sob banda limitada, requisições paralelas dividem a conexão. A versão sequencial ficou, com a justificativa no código e em [LIGHTHOUSE.md](LIGHTHOUSE.md).
+
+---
+
+## 16. Falhas de rota com recuperação, não tela branca
+
+**Decisão.** `defaultErrorComponent` no router (`RouteError`): mensagem, "Tentar novamente" (`reset()` + `router.invalidate()`, que refaz os loaders) e link para o início. Erros esperados de dados (rede, 4xx, 5xx) continuam tratados dentro de cada tela com `ErrorState`. O fallback de rota cobre só o inesperado.
+
+**Por quê.** Um erro de render sem boundary derruba a árvore inteira. Com o fallback por rota, o header e a navegação continuam vivos.
+
+---
+
+## 17. CI reproduzível e baselines por plataforma
+
+**Decisão.** GitHub Actions com três jobs: qualidade (typecheck, lint, unitários, build), E2E dentro da imagem `mcr.microsoft.com/playwright:v1.64.1-noble` e Lighthouse. Relatório HTML e relatórios do Lighthouse saem como artefatos.
+
+**Por quê.** Screenshot depende da renderização de fonte do sistema. Baselines geradas no macOS falham no Linux da CI. Rodando a suíte na mesma imagem localmente (`npm run test:e2e:docker`) e na CI, as baselines `-linux.png` são as mesmas nos dois lugares.
+
+**Custo.** Dois conjuntos de baselines versionados (darwin e linux).
+
+---
+
+## 18. Login como modal sobre a página atual (`?auth=`)
+
+**Decisão.** O botão "Entrar" adiciona `?auth=login` à URL atual e o root renderiza o diálogo por cima da página real, como no Figma. Fechar remove só o parâmetro. As rotas `/login` e `/signup` continuam existindo para os guards, a sessão expirada e o acesso direto, com herói e catálogo atrás.
+
+**Por quê.** Antes, o login era uma rota com um fundo fixo, e "Fechar" navegava para o `redirect`. Quando o redirect era uma rota protegida, o guard mandava de volta ao login e o modal parecia não fechar. Com o estado no search param, fechar é sempre seguro, e em `/login` fechar só volta ao `redirect` se ele for público.
+
+---
+
+## 19. Skeleton em toda request nova, não só na primeira
+
+**Decisão.** A lista continua com `placeholderData: keepPreviousData` (sem piscar o layout na troca de chave), mas a tela usa `isPlaceholderData` para trocar os cards antigos por skeletons enquanto os novos não chegam.
+
+**Por quê.** Na validação manual, o carregamento após trocar filtro ou página era invisível: os cards antigos ficavam e só um texto pequeno avisava. O enunciado pede skeletons nos componentes dependentes de dados.
+
+---
+
+## 20. Perfil com um único "Salvar"
+
+**Decisão.** Um formulário e um botão, como no Figma. O submit envia o perfil só se ele mudou e a troca de senha só se algum campo de senha foi preenchido, em paralelo (`Promise.allSettled`). Cada erro da API volta para o campo da request que falhou, e o toast diz exatamente o que foi salvo.
+
+**Por quê.** Revisa a decisão anterior (dois botões). O risco de sucesso parcial ambíguo foi resolvido com o retorno por campo e o toast específico.

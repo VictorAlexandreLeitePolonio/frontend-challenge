@@ -69,3 +69,33 @@ Resultado: a conexão continuava anônima, e o servidor (corretamente) não entr
 **Causa.** O `engine.io-client` guarda a referência de `globalThis.WebSocket` no momento em que é importado, e o app era importado antes do `worker.start()` aplicar o patch.
 
 **Correção.** O app só é importado depois de os mocks subirem, e o `socket.io-client` é carregado sob demanda.
+
+---
+
+## 7. Botões principais invisíveis no desktop (carrinho e pagamento)
+
+**Sintoma.** "Conectar e finalizar" e "Confirmar compra" ocupavam espaço, eram clicáveis e passavam no E2E, mas não apareciam na tela.
+
+**Causa raiz.** O `cn()` passa as classes pelo `tailwind-merge`, que trata `bg-gradient-to-b` (gradiente do botão mobile) e `bg-primary` (cor do `Button`) como o mesmo grupo e descarta a cor. No desktop, `md:bg-none` tirava o gradiente: fundo transparente com texto escuro.
+
+**Correção.** Gradiente só no mobile (`max-md:bg-gradient-to-b`), sem "aplicar e desligar". Só a comparação visual com o Figma pegou: o Playwright clica em elementos invisíveis por cor.
+
+---
+
+## 8. E2E sem backend em clones sem `.env` (e na CI)
+
+**Sintoma.** Num worktree novo, a home carregava sem nenhum card e o WebSocket tentava resolver `realtime.kurio.mock` no DNS.
+
+**Causa raiz.** Os mocks só ligavam com `VITE_ENABLE_MOCKS === 'true'`, e o `.env` é ignorado pelo git. A CI e a Vercel também não têm `.env`, então os E2E da CI teriam falhado do mesmo jeito.
+
+**Correção.** Mocks ligados por padrão; só `VITE_ENABLE_MOCKS=false` desliga. Os outros envs já tinham default.
+
+---
+
+## 9. Overflow e herói cortado em 768 px
+
+**Sintoma.** O projeto `tablet` acusou `scrollWidth` 774 na home e, na regressão visual, o título do herói cortado pela imagem e a newsletter do footer espremida.
+
+**Causa raiz.** Medidas fixas do Figma desktop (texto de 600 px + imagem de 450 px, footer em 4 colunas) somam mais que 768 px. Desktop e mobile não viam isso.
+
+**Correção.** Escala intermediária em `md` (herói com imagem de 300 px, footer em 2×2) e as medidas do Figma a partir de `lg`.

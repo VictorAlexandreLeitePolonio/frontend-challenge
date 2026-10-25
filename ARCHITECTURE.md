@@ -65,7 +65,7 @@ flowchart LR
   V -->|sim| X[descarta]
   V -->|não| Q[TanStack Query<br/>setQueryData / invalidate]
   Q --> UI[UI + aviso aria-live]
-  IO -->|connect após queda| R[invalida recursos ativos<br/>→ reconcilia via REST]
+  IO -->|todo connect| R[invalida recursos ativos<br/>→ reconcilia via REST]
 ```
 
 Envelope comum: `{ eventId, type, resource: { type, id }, version, occurredAt, data }`.
@@ -76,7 +76,7 @@ Envelope comum: `{ eventId, type, resource: { type, id }, version, occurredAt, d
 | `order.updated` | só o dono | `{ status }` | Atualiza o pedido; terminal → invalida carrinho e limpa tentativa pendente |
 
 - **Duplicatas e eventos antigos:** o cliente guarda os `eventId` vistos e a maior `version` por recurso (comparando também com a versão em cache). Evento repetido ou com `version <=` à conhecida é descartado sem efeitos.
-- **Reconexão:** no `connect` após uma queda, o cliente invalida catálogo, detalhes, carrinho e pedidos ativos (reconciliação REST).
+- **Conexão e reconexão:** em todo `connect`, o cliente invalida catálogo, detalhes, carrinho e pedidos cujo dado é anterior ao handshake (reconciliação REST). Cobre a queda e a janela entre o primeiro fetch e a primeira conexão.
 - **Sessões:** o socket é recriado a cada troca de usuário com o token da sessão; o cleanup remove listeners e desconecta. O servidor só entrega `order.updated` para conexões cujo token pertence ao dono do pedido.
 
 ### Transporte nos mocks e limitações
@@ -159,7 +159,7 @@ sequenceDiagram
 
 ## Mocks e cenários
 
-- `VITE_ENABLE_MOCKS=true` ativa o MSW em dev e no build publicado.
+- O MSW fica ativo por padrão (dev, build publicado, CI); `VITE_ENABLE_MOCKS=false` desliga para um backend real.
 - Banco em `localStorage['kurio:db']`; `reset()` restaura o seed determinístico (PRNG com seed fixa).
 - Cenários: `?scenario=<id>` (persistido) ou DevPanel. Lista em `src/mocks/scenarios.ts` e no README.
 - `window.__kurioMock` expõe controles do servidor (alterar preço, esgotar, derrubar socket, expirar sessão, duplicar/enviar evento antigo). Todos agem no `db` e emitem pelo transporte Socket.IO — nunca no cache da UI.
@@ -168,15 +168,17 @@ sequenceDiagram
 
 Decisões completas (com alternativas e custos) em [docs/DECISIONS.md](docs/DECISIONS.md). Bugs encontrados na verificação em [docs/BUGS.md](docs/BUGS.md).
 
-**Fora do escopo, sem simular sucesso.** Social login, "Esqueceu a senha?", newsletter, blog, Criadores, Aprenda, compartilhamento e itens do menu de perfil (Atividade, Lista de interesse, Ofertas, Arquivos, Suporte) aparecem desabilitados com "Em breve", acessíveis (`aria-disabled` + texto para leitores de tela).
+**Fora do escopo, sem simular sucesso.** Login social mantém o visual do Figma e responde com um aviso (toast) ao clique, sem fingir autenticação. "Esqueceu a senha?", newsletter, blog, Criadores, Aprenda, compartilhamento e itens do menu de perfil (Atividade, Lista de interesse, Ofertas, Arquivos, Suporte) aparecem desabilitados com "Em breve", acessíveis (`aria-disabled` + texto para leitores de tela).
 
 **Desvios do Figma:**
 
 | Tela | Desvio | Motivo |
 | --- | --- | --- |
-| Início (desktop) | Campo de busca acima da grade | O Figma desktop não tem busca, mas o enunciado exige |
+| Início (desktop) | Busca na lupa do header, que expande um campo inline | O Figma desktop não tem campo de busca, mas o enunciado exige; a lupa já existe no frame, então a barra de abas fica idêntica |
 | Início | Grade de 2 colunas em 768 px (3 a partir de 1024) | Evitar cards comprimidos no tablet |
+| Início | Loading troca os cards por skeletons em toda request nova (filtro, página, busca) | O enunciado pede skeletons nos componentes dependentes de dados; manter os cards antigos com um aviso discreto deixava o carregamento invisível |
 | Início | Preço do card = edição 1/50 | Igual ao detalhe e ao Figma (1.19 ETH); evita card e detalhe com preços diferentes |
+| Detalhe | "Mais desta coleção" com 3 cards (Figma: 5) | Só mostra NFTs da mesma coleção; o mock tem 3 outros por coleção, completar com outras coleções contradiria o título |
 | Detalhe | Ícones de compartilhamento genéricos | `lucide-react` 1.x não tem ícones de marca; compartilhamento está fora do escopo |
 | Detalhe/Carrinho/Pagamento (mobile) | Sem tab bar inferior | Os frames mobile dessas telas têm barra de ação própria |
 | Carrinho | Linha mostra edição e subtotal | Necessário para distinguir edições do mesmo NFT |
@@ -184,9 +186,11 @@ Decisões completas (com alternativas e custos) em [docs/DECISIONS.md](docs/DECI
 | Pagamento | Campos de rede, endereço, tipo, ENS e indicação vêm da carteira escolhida | Pertencem à carteira cadastrada; editar soltos no checkout geraria divergência com o servidor |
 | Pagamento (mobile) | Layout derivado do desktop | O frame mobile não pôde ser exportado (limite da API do Figma); segue o padrão do carrinho mobile |
 | Confirmação | Tela própria com o card de 578 px | Garante acesso direto e refresh ao recibo |
-| Perfil | "Salvar" e "Alterar senha" separados | Endpoints distintos; um único botão poderia ter sucesso parcial sem deixar claro o que falhou |
+| Perfil | Igual ao Figma: um único "Salvar" | Envia perfil e/ou senha só se mudaram; cada erro da API volta para o campo da request que falhou, e o toast diz o que foi salvo |
+| Carteiras | Igual ao Figma: formulário direto, já preenchido | Status de conexão discreto ao lado do título; "Igual à carteira principal" pré-preenche a secundária |
+| Login/Cadastro (desktop) | Modal sobre a página atual (`?auth=login\|signup`) | Fechar só remove o parâmetro; em `/login` (guards, sessão expirada) o fundo é herói + catálogo e fechar nunca volta a uma rota protegida |
 | Login/Cadastro (mobile) | Botão fechar (X) | A tela é um diálogo em tela cheia com foco contido; precisa de saída |
-| Footer | Ícones sociais como siglas | Mesmo motivo dos ícones de marca |
+| Tablet (768) | Herói e destaques do footer em escala intermediária | O Figma só tem 1440 e 414; as medidas fixas do desktop não cabem em 768 |
 
 **Outros detalhes:**
 - Arrays nos search params seguem a serialização JSON do TanStack Router (`?collections=["music"]`), que mantém tipos e round-trip.

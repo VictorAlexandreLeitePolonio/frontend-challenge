@@ -1,6 +1,6 @@
 # Rastreabilidade dos requisitos
 
-Cada requisito do [enunciado](CHALLENGE.md) ligado à implementação e à evidência que o comprova. Os testes ficam em `e2e/` e rodam em Chromium, nos projetos `desktop` (1440) e `mobile` (390).
+Cada requisito do [enunciado](CHALLENGE.md) ligado à implementação e à evidência que o comprova. Os testes ficam em `e2e/` e rodam em Chromium, nos projetos `desktop` (1440), `tablet` (768) e `mobile` (390), localmente e na CI (imagem Docker do Playwright).
 
 Legenda: ✅ atendido e testado · ◐ atendido com ressalva (explicada na linha).
 
@@ -15,7 +15,7 @@ Legenda: ✅ atendido e testado · ◐ atendido com ressalva (explicada na linha
 | Socket.IO | `socket.io-client` real, interceptado pelo MSW | `src/realtime/`, `src/mocks/socket.ts` |
 | Tailwind + shadcn/ui | Tema com tokens do Figma, 16 componentes Radix adaptados | `src/styles.css`, `src/components/ui/` |
 | MSW | REST + WebSocket, cenários, persistência e reset | `src/mocks/` |
-| Playwright | 38 testes × 2 viewports, regressão visual | `e2e/` |
+| Playwright | 38 testes × 3 viewports, regressão visual | `e2e/` |
 | Lighthouse | 3 execuções por página/perfil, relatórios versionados | `lighthouserc.*.json`, [LIGHTHOUSE.md](LIGHTHOUSE.md) |
 
 ## Telas e fluxos (§3)
@@ -53,7 +53,7 @@ Legenda: ✅ atendido e testado · ◐ atendido com ressalva (explicada na linha
 | Requisito | Onde |
 | --- | --- |
 | Contratos tipados transporte → estado → UI | `schemas/` + `schema.parse` nos services |
-| Estados de carregamento, vazio, erro, sucesso e background | skeletons, `EmptyState`, `ErrorState`, "Atualizando resultados…" |
+| Estados de carregamento, vazio, erro, sucesso e background | skeletons com shimmer em toda request nova (inclusive troca de filtro e página), `EmptyState`, `ErrorState`, anúncio `aria-live` "Carregando NFTs…" |
 | Invalidação após mutations e eventos | `hooks/`, `realtime/useRealtimeSync.ts` |
 | Cancelamento/descarte de respostas obsoletas | `signal` repassado ao Axios + chave por parâmetros |
 | Isolamento por usuário e parâmetros | `hooks/query-keys.ts` (`userId` nas chaves privadas) |
@@ -73,7 +73,7 @@ Legenda: ✅ atendido e testado · ◐ atendido com ressalva (explicada na linha
 | Mudanças refletidas em REST e eventos | `mocks/effects.ts` altera o `db` e emite pelo mesmo caminho |
 | `nft.updated` / `order.updated` com identidade, recurso e versão | `schemas/events.ts` |
 | Duplicatas e eventos antigos não regridem | `realtime.spec` › eventos duplicados ou antigos |
-| Reconciliação após reconexão | `useRealtimeSync` (`connect`) |
+| Reconciliação após reconexão | `useRealtimeSync`: todo `connect` (inicial e reconexão) reconcilia o que é anterior ao handshake |
 | Eventos de outra sessão não vazam | entrega por dono no servidor + socket por usuário |
 | Listeners liberados no fim do ciclo de vida | cleanup do efeito (`removeAllListeners` + `disconnect`) |
 
@@ -82,7 +82,7 @@ Legenda: ✅ atendido e testado · ◐ atendido com ressalva (explicada na linha
 | Requisito | Status | Evidência |
 | --- | :-: | --- |
 | Fidelidade ao Figma | ◐ | Tokens e frames reproduzidos. Desvios justificados em [ARCHITECTURE.md](../ARCHITECTURE.md#decisões-de-ux-e-desvios-do-figma) |
-| 390 / 768 / 1440 sem overflow | ✅ | `a11y-loading.spec` › sem overflow (contra a largura do dispositivo) |
+| 390 / 768 / 1440 sem overflow | ✅ | `a11y-loading.spec` › sem overflow (contra a largura do dispositivo), rodando nos três projetos |
 | Skeletons com shimmer e `prefers-reduced-motion` | ✅ | `.shimmer` só anima com `no-preference`; `a11y-loading.spec` › carregamento lento |
 | Teclado, foco visível, foco em diálogos | ✅ | `a11y-loading.spec` › teclado |
 | Labels e erros associados | ✅ | `a11y-loading.spec` › formulário anuncia erros |
@@ -94,8 +94,8 @@ Legenda: ✅ atendido e testado · ◐ atendido com ressalva (explicada na linha
 | Requisito | Evidência |
 | --- | --- |
 | Itens 1–12 do enunciado | ver tabelas acima (cada linha cita o spec) |
-| Chromium desktop e mobile | `playwright.config.ts` |
-| Regressão visual de início, detalhe, carrinho e pagamento | `e2e/visual.spec.ts` + baselines |
+| Chromium desktop e mobile | `playwright.config.ts` (desktop, tablet e mobile); `.github/workflows/ci.yml` |
+| Regressão visual de início, detalhe, carrinho e pagamento | `e2e/visual.spec.ts` + baselines darwin e linux nos três viewports |
 | Estado isolado, relógio, latência e eventos controlados | `e2e/fixtures.ts`, `page.clock`, cenários, `__kurioMock` |
 | Relatório HTML e traces | `reporter: html`, `trace: 'retain-on-failure'` |
 | Lighthouse ≥ metas, medianas, LCP/CLS/TBT | [LIGHTHOUSE.md](LIGHTHOUSE.md) |
