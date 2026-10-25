@@ -51,7 +51,7 @@ test.describe('sessão com relógio controlado', () => {
   test('expira após o TTL do servidor e a próxima ação privada pede login', async ({ page }) => {
     await page.clock.install()
     await login(page, ALICE, '/wallets')
-    await expect(page.getByText('Cofre principal').first()).toBeVisible()
+    await expect(page.getByLabel(/^Apelido da carteira/).first()).toHaveValue('Cofre principal')
     // TTL de 20 s no cenário: avança o relógio da página (Date e timers) sem esperar de verdade
     await page.clock.runFor(25_000)
     await page.goto('/profile')
@@ -61,11 +61,11 @@ test.describe('sessão com relógio controlado', () => {
 
 test('troca de usuário não expõe dados do anterior', async ({ page }) => {
   await login(page, ALICE, '/wallets')
-  await expect(page.getByText('Cofre principal').first()).toBeVisible()
+  await expect(page.getByLabel(/^Apelido da carteira/).first()).toHaveValue('Cofre principal')
   await logout(page)
   await login(page, BOB, '/wallets')
   await expect(page).toHaveURL(/\/wallets/)
   await expect(page.getByLabel(/^Nome de exibição/).first()).toBeVisible()
-  await expect(page.getByText('Cofre principal')).toHaveCount(0)
+  await expect(page.getByLabel(/^Apelido da carteira/).first()).toHaveValue('')
   expect(await page.evaluate(() => window.__kurioMock?.connectedUsers())).toEqual(['u_bob'])
 })
