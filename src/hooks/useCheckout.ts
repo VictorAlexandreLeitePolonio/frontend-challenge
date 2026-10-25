@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useMemo, useSyncExternalStore } from 'react'
 import { pendingOrderStore, type PendingOrder } from '@/lib/storage'
 import type { CreateOrderInput, Order } from '@/schemas/order'
 import type { QuoteInput } from '@/schemas/quote'
@@ -18,8 +18,9 @@ export function useCreateQuote() {
 export function usePlaceOrder() {
   const { user } = useSession()
   const queryClient = useQueryClient()
-  const store = pendingOrderStore(user?.id ?? 'anon')
-  const [attempt, setAttempt] = useState<PendingOrder | null>(() => store.get())
+  const store = useMemo(() => pendingOrderStore(user?.id ?? 'anon'), [user?.id])
+  const raw = useSyncExternalStore(store.subscribe, store.snapshot)
+  const attempt = useMemo<PendingOrder | null>(() => (raw ? store.get() : null), [raw, store])
 
   const mutation = useMutation({
     mutationFn: async (input: CreateOrderInput): Promise<Order> => {
@@ -29,11 +30,9 @@ export function usePlaceOrder() {
           ? { ...current, input }
           : { quoteId: input.quoteId, idempotencyKey: crypto.randomUUID(), orderId: null, input }
       store.set(next)
-      setAttempt(next)
       const order = await orderService.create(next.input, next.idempotencyKey)
       const saved = { ...next, orderId: order.id }
       store.set(saved)
-      setAttempt(saved)
       return order
     },
     onSuccess: (order) => {
@@ -50,10 +49,7 @@ export function usePlaceOrder() {
     error: mutation.error,
     reset: mutation.reset,
     attempt,
-    clearAttempt: () => {
-      store.set(null)
-      setAttempt(null)
-    },
+    clearAttempt: () => store.set(null),
   }
 }
 

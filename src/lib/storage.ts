@@ -65,8 +65,31 @@ export interface PendingOrder {
   input: CreateOrderInput
 }
 
-/** Tentativa de compra em andamento, por usuário — sobrevive a refresh e reconexão. */
-export const pendingOrderStore = (userId: string) => jsonStore<PendingOrder>(local, `kurio:pending-order:${userId}`)
+const pendingOrderListeners = new Set<() => void>()
+
+/**
+ * Tentativa de compra em andamento, por usuário — sobrevive a refresh e reconexão.
+ * Observável: todas as telas que usam a tentativa (checkout, recuperação) veem a mesma versão.
+ */
+export const pendingOrderStore = (userId: string) => {
+  const key = `kurio:pending-order:${userId}`
+  const store = jsonStore<PendingOrder>(local, key)
+  return {
+    get: store.get,
+    /** String crua: snapshot estável para useSyncExternalStore. */
+    snapshot: () => read(local, key),
+    set(value: PendingOrder | null) {
+      store.set(value)
+      for (const listener of pendingOrderListeners) listener()
+    },
+    subscribe(listener: () => void) {
+      pendingOrderListeners.add(listener)
+      return () => {
+        pendingOrderListeners.delete(listener)
+      }
+    },
+  }
+}
 
 /** Rascunho do formulário de pagamento para retomada após sessão expirada. */
 export const checkoutDraftStore = (userId: string) => jsonStore<Record<string, unknown>>(session, `kurio:checkout-draft:${userId}`)

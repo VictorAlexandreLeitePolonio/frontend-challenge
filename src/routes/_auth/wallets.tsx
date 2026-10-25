@@ -25,7 +25,7 @@ function Page() {
   return (
     <PageContainer className="pt-8 pb-16">
       <h1 className="sr-only">Carteiras</h1>
-      <div className="grid gap-7 md:grid-cols-[310px_minmax(0,1fr)]">
+      <div className="grid grid-cols-1 gap-7 md:grid-cols-[310px_minmax(0,1fr)]">
         <AccountSidebar />
         <div className="flex flex-col gap-8">
           {fromCheckout && justSaved && (

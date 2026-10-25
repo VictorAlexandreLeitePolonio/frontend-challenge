@@ -16,7 +16,7 @@ function Page() {
 
   return (
     <PageContainer className="pt-8 pb-16">
-      <div className="grid gap-7 md:grid-cols-[310px_minmax(0,1fr)]">
+      <div className="grid grid-cols-1 gap-7 md:grid-cols-[310px_minmax(0,1fr)]">
         <AccountSidebar />
         <section aria-labelledby="profile-title">
           <h1 id="profile-title" className="text-base font-bold">

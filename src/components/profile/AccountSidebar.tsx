@@ -28,7 +28,7 @@ export function AccountSidebar() {
     })
 
   return (
-    <aside className="md:w-[310px] md:shrink-0">
+    <aside className="min-w-0 md:w-[310px] md:shrink-0">
       <div className="border border-border bg-card md:border-0">
         <h2 className="hidden px-2.5 py-2 text-base font-bold md:block">Meu perfil</h2>
         <nav aria-label="Conta" className="flex gap-1 overflow-x-auto px-2 md:flex-col md:gap-0 md:px-0">
