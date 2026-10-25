@@ -2,7 +2,7 @@ import { ALICE, addToCart, expect, goToReview, login, serverOrders, test } from 
 
 test('compra completa do catálogo ao recibo confirmado', async ({ page }) => {
   await page.goto('/')
-  await page.locator('#catalogo').getByRole('link', { name: 'Emerald Ape #042' }).click()
+  await page.locator('#catalogo').getByRole('link', { name: 'Emerald Ape #042', exact: true }).click()
   await expect(page).toHaveURL(/\/nft\/emerald-ape-042/)
   await page.getByRole('button', { name: /^comprar( nft)?$/i }).filter({ visible: true }).first().click()
   await page.waitForURL('**/cart')
