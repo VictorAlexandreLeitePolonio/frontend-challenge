@@ -55,6 +55,19 @@ Visitante é identificado pelo header `X-Guest-Cart: <uuid>` (gerado no cliente)
 
 ## Eventos Socket.IO
 
+```mermaid
+flowchart LR
+  A[DevPanel / cenário / confirmação de pedido] -->|altera| DB[(mocks/db)]
+  DB --> B[mocks/bus]
+  B --> WS[mocks/socket<br/>filtra por dono]
+  WS -->|WebSocket interceptado| IO[socket.io-client]
+  IO --> V{eventId visto?<br/>version <= conhecida?}
+  V -->|sim| X[descarta]
+  V -->|não| Q[TanStack Query<br/>setQueryData / invalidate]
+  Q --> UI[UI + aviso aria-live]
+  IO -->|connect após queda| R[invalida recursos ativos<br/>→ reconcilia via REST]
+```
+
 Envelope comum: `{ eventId, type, resource: { type, id }, version, occurredAt, data }`.
 
 | Evento | Destino | `data` | Efeito no cliente |
@@ -72,7 +85,8 @@ Envelope comum: `{ eventId, type, resource: { type, id }, version, occurredAt, d
 - Só WebSocket (`transports: ['websocket']`): o MSW intercepta WebSocket, não long-polling.
 - O binding responde o handshake sozinho e ignora o payload `auth` do CONNECT; por isso o token vai na **query** da conexão.
 - O binding não envia ping do Engine.IO; o servidor simulado envia `"2"` a cada 20 s para o cliente não encerrar a conexão.
-- O `engine.io-client` captura `globalThis.WebSocket` no import. Por isso `main.tsx` inicia o MSW **antes** de importar a aplicação.
+- O `engine.io-client` captura `globalThis.WebSocket` no import. Por isso `main.tsx` inicia o MSW **antes** de importar a aplicação, e o `socket.io-client` é carregado sob demanda (`realtime/socket.ts`).
+- O `io()` reaproveita o Manager em cache para a mesma URL; cada sessão usa `forceNew: true` para não herdar a query (token) da anterior.
 - O "servidor" vive na aba: duas abas compartilham o `localStorage` (sincronizado pelo evento `storage`), mas cada aba tem seu próprio emissor de eventos.
 
 ## Sessão
@@ -93,6 +107,35 @@ Envelope comum: `{ eventId, type, resource: { type, id }, version, occurredAt, d
 - `priceChanged`/`previousUnitPrice` indicam alteração de preço desde que o item entrou no carrinho.
 
 ## Checkout e pedidos
+
+```mermaid
+sequenceDiagram
+  autonumber
+  actor U as Usuário
+  participant C as Checkout (React)
+  participant S as localStorage
+  participant API as MSW /api
+  participant WS as Socket.IO (MSW)
+  U->>C: Revisar pedido
+  C->>API: POST /quote {network, walletId}
+  API-->>C: Quote (valores congelados)
+  U->>C: Confirmar compra (1 ou N cliques)
+  C->>S: salva {quoteId, Idempotency-Key, corpo}
+  C->>API: POST /orders + Idempotency-Key
+  alt preço/estoque/cupom/taxa mudou
+    API-->>C: 409 QUOTE_STALE + nova cotação
+    C-->>U: mostra a diferença e pede nova confirmação
+  else timeout / rede
+    C-->>U: "Tentar novamente"
+    C->>API: mesma chave + mesmo corpo
+    API-->>C: o MESMO pedido (sem duplicar)
+  else ok
+    API-->>C: 201 Order (pending)
+  end
+  API->>WS: ~2,5 s depois: confirma ou recusa
+  WS-->>C: order.updated {status, version} (só para o dono)
+  C-->>U: recibo (snapshot) ou recusa com itens preservados
+```
 
 1. "Revisar" → `POST /quote` congela itens, preços, cupom e taxa da rede escolhida.
 2. "Confirmar" → `usePlaceOrder` gera **uma `Idempotency-Key` por cotação** e grava `{quoteId, key, corpo}` em `localStorage` antes do envio.
@@ -123,8 +166,29 @@ Envelope comum: `{ eventId, type, resource: { type, id }, version, occurredAt, d
 
 ## Decisões de UX e desvios do Figma
 
-- Social login, "Esqueceu a senha?", newsletter, blog, Criadores, Aprenda e itens do menu de perfil fora do escopo aparecem desabilitados com "Em breve" — nunca simulam sucesso.
-- Frame "Mobile / Pagamento" não pôde ser exportado (limite da API do Figma no plano Starter); o layout mobile do pagamento segue o padrão do carrinho mobile.
-- Ícones de redes sociais da marca não existem no `lucide-react` 1.x; substituídos por siglas em caixas com o mesmo estilo.
+Decisões completas (com alternativas e custos) em [docs/DECISIONS.md](docs/DECISIONS.md). Bugs encontrados na verificação em [docs/BUGS.md](docs/BUGS.md).
+
+**Fora do escopo, sem simular sucesso.** Social login, "Esqueceu a senha?", newsletter, blog, Criadores, Aprenda, compartilhamento e itens do menu de perfil (Atividade, Lista de interesse, Ofertas, Arquivos, Suporte) aparecem desabilitados com "Em breve", acessíveis (`aria-disabled` + texto para leitores de tela).
+
+**Desvios do Figma:**
+
+| Tela | Desvio | Motivo |
+| --- | --- | --- |
+| Início (desktop) | Campo de busca acima da grade | O Figma desktop não tem busca, mas o enunciado exige |
+| Início | Grade de 2 colunas em 768 px (3 a partir de 1024) | Evitar cards comprimidos no tablet |
+| Início | Preço do card = edição 1/50 | Igual ao detalhe e ao Figma (1.19 ETH); evita card e detalhe com preços diferentes |
+| Detalhe | Ícones de compartilhamento genéricos | `lucide-react` 1.x não tem ícones de marca; compartilhamento está fora do escopo |
+| Detalhe/Carrinho/Pagamento (mobile) | Sem tab bar inferior | Os frames mobile dessas telas têm barra de ação própria |
+| Carrinho | Linha mostra edição e subtotal | Necessário para distinguir edições do mesmo NFT |
+| Pagamento | Fluxo em duas etapas (Revisar → Confirmar) | O enunciado exige revisão antes do envio e revalidação da cotação |
+| Pagamento | Campos de rede, endereço, tipo, ENS e indicação vêm da carteira escolhida | Pertencem à carteira cadastrada; editar soltos no checkout geraria divergência com o servidor |
+| Pagamento (mobile) | Layout derivado do desktop | O frame mobile não pôde ser exportado (limite da API do Figma); segue o padrão do carrinho mobile |
+| Confirmação | Tela própria com o card de 578 px | Garante acesso direto e refresh ao recibo |
+| Perfil | "Salvar" e "Alterar senha" separados | Endpoints distintos; um único botão poderia ter sucesso parcial sem deixar claro o que falhou |
+| Login/Cadastro (mobile) | Botão fechar (X) | A tela é um diálogo em tela cheia com foco contido; precisa de saída |
+| Footer | Ícones sociais como siglas | Mesmo motivo dos ícones de marca |
+
+**Outros detalhes:**
+- Arrays nos search params seguem a serialização JSON do TanStack Router (`?collections=["music"]`), que mantém tipos e round-trip.
 - Fonte Roboto Mono self-hosted via `@fontsource-variable/roboto-mono`.
 - As imagens dos NFTs são as 4 artes originais do Figma, exportadas em WebP 640/1080 px.

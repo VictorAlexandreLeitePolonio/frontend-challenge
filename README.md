@@ -3,7 +3,25 @@
 Implementação do desafio frontend ([enunciado](docs/CHALLENGE.md)): descoberta, compra e conta do colecionador, com backend REST e tempo real simulados por MSW.
 
 - **Stack:** React 19, TypeScript, Vite, TanStack Router, TanStack Query, Axios, Zod, React Hook Form, Tailwind CSS 4, shadcn/ui, MSW 2 + `@mswjs/socket.io-binding`, `socket.io-client`, Playwright, Lighthouse CI.
-- **Arquitetura, contratos, eventos, sessão, carrinho, cache e desvios do Figma:** [ARCHITECTURE.md](ARCHITECTURE.md).
+
+| Documento | Conteúdo |
+| --- | --- |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | Camadas, contratos REST, eventos Socket.IO, sessão, carrinho, checkout, cache e desvios do Figma, com diagramas |
+| [docs/DECISIONS.md](docs/DECISIONS.md) | 15 decisões técnicas: contexto, alternativas descartadas e custo aceito |
+| [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) | Cada requisito do enunciado → código → teste que o comprova |
+| [docs/BUGS.md](docs/BUGS.md) | Bugs encontrados na verificação, com causa raiz e correção |
+| [docs/LIGHTHOUSE.md](docs/LIGHTHOUSE.md) | Medianas, LCP/CLS/TBT, ambiente e análise |
+
+## Avaliação em 5 minutos
+
+1. `npm ci && npm run dev` e abra `http://localhost:5173`.
+2. **Catálogo:** filtre por coleção e rede, ordene, pagine, recarregue a página e use voltar. O estado vem da URL.
+3. **Compra:** abra "Emerald Ape #042", clique em **Comprar**, aplique o cupom `KURIO10` e clique em **Conectar e finalizar**. Entre como `alice@kurio.dev` / `Kurio@123` (o carrinho do visitante é mantido), conecte a carteira, revise e confirme **duas vezes seguidas**: sai um único pedido, e o recibo chega via Socket.IO.
+4. **Tempo real:** com o pagamento em revisão, abra o painel de cenários (frasco, canto inferior esquerdo) e use "Subir preço do 1º item". A cotação é descartada e uma nova revisão passa a ser obrigatória.
+5. **Falhas:** no mesmo painel, escolha `order-timeout` e repita a compra. Em "Tentar novamente", o mesmo pedido é recuperado.
+6. **Testes:** `npm run test:e2e` roda 76 execuções (38 testes × desktop/mobile) com o relatório HTML.
+
+Na suíte E2E, os testes de tempo real passam pelo `socket.io-client` real e os de REST pelos handlers MSW. Nenhum teste injeta estado direto na UI ou no cache.
 
 ## Setup
 
@@ -32,8 +50,8 @@ npm run dev          # http://localhost:5173, já com os mocks ativos
 | `npm run preview` | Serve o build em `http://localhost:4173` |
 | `npm run typecheck` | Verificação de tipos |
 | `npm run lint` | Lint (oxlint) |
-| `npm test` | Testes unitários (aritmética ETH e domínio do mock) |
-| `npm run test:e2e` | Playwright (Chromium, desktop 1440 e mobile 390) |
+| `npm test` | Testes unitários da lógica crítica: aritmética ETH e regras de domínio do mock |
+| `npm run test:e2e` | Playwright: 38 testes em Chromium, desktop 1440 e mobile 390 (inclui regressão visual) |
 | `npm run test:e2e:update` | Atualiza as baselines de regressão visual |
 | `npm run lighthouse` | Auditoria Lighthouse (desktop e mobile, 3 execuções) |
 
