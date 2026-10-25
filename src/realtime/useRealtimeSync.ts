@@ -12,6 +12,9 @@ import { realtimeEvents } from './events'
 import type { Socket } from 'socket.io-client'
 import { createSocket } from './socket'
 
+/** Recursos que recebem eventos e precisam ser reconciliados com o REST a cada conexão. */
+const RECONCILED = new Set(['nfts', 'nft', 'cart', 'order'])
+
 /**
  * Liga o Socket.IO ao cache do TanStack Query. Recriado a cada troca de usuário:
  * listeners, versões vistas e conexão da sessão anterior são descartados no cleanup.
@@ -27,7 +30,6 @@ export function useRealtimeSync() {
     let disposed = false
     const seenEvents = new Set<string>()
     const lastVersion = new Map<string, number>()
-    let hasConnected = false
 
     /** Duplicata (mesmo eventId) ou versão <= já aplicada: ignora sem reaplicar efeitos. */
     const isFresh = (eventId: string, resource: string, version: number, cachedVersion?: number) => {
@@ -84,14 +86,16 @@ export function useRealtimeSync() {
       })
 
       // Reconexão: eventos perdidos durante a queda são reconciliados com a API REST.
+      // Conexão (inicial ou reconexão): eventos emitidos entre o último fetch REST e este momento
+      // não chegaram. Reconcilia só os recursos ativos cujo dado é anterior à conexão.
       socket.on('connect', () => {
-        if (hasConnected) {
-          queryClient.invalidateQueries({ queryKey: queryKeys.nftLists })
-          queryClient.invalidateQueries({ queryKey: ['nft'] })
-          queryClient.invalidateQueries({ queryKey: ['cart'] })
-          if (userId) queryClient.invalidateQueries({ queryKey: queryKeys.orders(userId) })
-        }
-        hasConnected = true
+        const connectedAt = Date.now()
+        void queryClient.invalidateQueries({
+          predicate: (query) =>
+            RECONCILED.has(String(query.queryKey[0])) &&
+            query.state.dataUpdatedAt > 0 &&
+            query.state.dataUpdatedAt < connectedAt,
+        })
       })
 
     }

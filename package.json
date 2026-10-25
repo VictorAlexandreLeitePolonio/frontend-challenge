@@ -12,7 +12,9 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "test:e2e:update": "playwright test --update-snapshots",
-    "lighthouse": "npm run build && lhci autorun --config=lighthouserc.desktop.json && lhci autorun --config=lighthouserc.mobile.json"
+    "lighthouse": "npm run build && lhci autorun --config=lighthouserc.desktop.json && lhci autorun --config=lighthouserc.mobile.json",
+    "test:e2e:docker": "docker run --rm --ipc=host -v \"$PWD\":/work -v /work/node_modules -w /work mcr.microsoft.com/playwright:v1.64.1-noble bash -c 'npm ci --no-audit --no-fund && npx playwright test'",
+    "test:e2e:docker:update": "docker run --rm --ipc=host -v \"$PWD\":/work -v /work/node_modules -w /work mcr.microsoft.com/playwright:v1.64.1-noble bash -c 'npm ci --no-audit --no-fund && npx playwright test --update-snapshots'"
   },
   "dependencies": {
     "@fontsource-variable/roboto-mono": "^5.3.0",
