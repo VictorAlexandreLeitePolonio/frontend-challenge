@@ -44,7 +44,8 @@ export function HeroBanner() {
               event.preventDefault()
               scrollToCatalog()
             }}
-            className="mt-0.5 flex w-fit items-center gap-1 text-xs font-bold tracking-wide text-accent-text md:hidden"
+            // laranja um tom mais claro: o link fica sobre o círculo decorativo (#674228) e precisa de 4,5:1
+            className="mt-0.5 flex w-fit items-center gap-1 text-xs font-bold tracking-wide text-[#f3b06f] md:hidden"
           >
             EXPLORAR
             <ArrowRight className="size-4" aria-hidden="true" />
