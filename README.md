@@ -2,6 +2,7 @@
 
 Implementação do desafio frontend ([enunciado](docs/CHALLENGE.md)): descoberta, compra e conta do colecionador, com backend REST e tempo real simulados por MSW.
 
+- **Deploy:** https://kurio-nft-marketplace-one.vercel.app
 - **Stack:** React 19, TypeScript, Vite, TanStack Router, TanStack Query, Axios, Zod, React Hook Form, Tailwind CSS 4, shadcn/ui, MSW 2 + `@mswjs/socket.io-binding`, `socket.io-client`, Playwright, Lighthouse CI.
 
 | Documento | Conteúdo |
