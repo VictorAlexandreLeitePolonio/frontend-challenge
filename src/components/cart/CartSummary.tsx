@@ -60,11 +60,11 @@ export function CartSummary({ cart }: CartSummaryProps) {
       Conectar e finalizar
     </Button>
   ) : isAuthenticated ? (
-    <Button asChild className="h-[60px] w-full rounded-full bg-gradient-to-b from-accent-text to-primary text-base md:h-10 md:rounded-sm md:bg-none md:text-sm">
+    <Button asChild className="h-[60px] w-full rounded-full text-base max-md:bg-gradient-to-b max-md:from-accent-text max-md:to-primary md:h-10 md:rounded-sm md:text-sm">
       <Link to="/checkout">Conectar e finalizar</Link>
     </Button>
   ) : (
-    <Button asChild className="h-[60px] w-full rounded-full bg-gradient-to-b from-accent-text to-primary text-base md:h-10 md:rounded-sm md:bg-none md:text-sm">
+    <Button asChild className="h-[60px] w-full rounded-full text-base max-md:bg-gradient-to-b max-md:from-accent-text max-md:to-primary md:h-10 md:rounded-sm md:text-sm">
       <Link to="/login" search={{ redirect: '/checkout' }}>
         Conectar e finalizar
       </Link>

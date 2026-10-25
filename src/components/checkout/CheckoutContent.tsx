@@ -112,7 +112,7 @@ export function CheckoutContent({ cart, wallets, profile, user }: CheckoutConten
                   onClick={flow.confirm}
                   disabled={!flow.canProceed || flow.isSubmitting}
                   aria-describedby={flow.reason ? REASON_ID : undefined}
-                  className="h-[60px] w-full rounded-full bg-gradient-to-b from-accent-text to-primary text-base md:h-10 md:rounded-sm md:bg-none md:text-sm"
+                  className="h-[60px] w-full rounded-full text-base max-md:bg-gradient-to-b max-md:from-accent-text max-md:to-primary md:h-10 md:rounded-sm md:text-sm"
                 >
                   {flow.isSubmitting ? (
                     <>
@@ -139,7 +139,7 @@ export function CheckoutContent({ cart, wallets, profile, user }: CheckoutConten
                 form={FORM_ID}
                 disabled={!flow.canProceed || flow.isReviewing || flow.isSubmitting}
                 aria-describedby={flow.reason ? REASON_ID : undefined}
-                className="h-[60px] w-full rounded-full bg-gradient-to-b from-accent-text to-primary text-base md:h-10 md:rounded-sm md:bg-none md:text-sm"
+                className="h-[60px] w-full rounded-full text-base max-md:bg-gradient-to-b max-md:from-accent-text max-md:to-primary md:h-10 md:rounded-sm md:text-sm"
               >
                 {flow.isReviewing ? (
                   <>
